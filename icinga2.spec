@@ -149,7 +149,7 @@ BuildRequires: boost-devel >= 1.48
 %endif
 
 %if 0%{?use_systemd}
-BuildRequires: systemd
+BuildRequires: systemd-devel
 Requires: systemd
 %endif
 
