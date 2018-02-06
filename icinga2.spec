@@ -211,7 +211,7 @@ Group:        System/Libraries
 Requires:     %{name}-common = %{version}-%{release}
 
 %description libs
-This subpackage provides the internal libraries for the daemon or studio.
+This subpackage provides the internal libraries for the daemon.
 
 
 %package ido-mysql
@@ -262,18 +262,6 @@ Requires(postun): policycoreutils-python
 
 %description selinux
 SELinux policy module supporting icinga2
-%endif
-
-
-%if 0%{?fedora}
-%package studio
-Summary:      Studio for Icinga 2
-Group:        System/Monitoring
-Requires:     %{name}-libs = %{version}-%{release}
-Requires:     wxGTK3
-
-%description studio
-Provides a GUI for the Icinga 2 API.
 %endif
 
 
@@ -408,24 +396,6 @@ cd -
 
 # TODO: Fix build problems on Icinga, see https://github.com/Icinga/puppet-icinga_build/issues/11
 #/usr/sbin/hardlink -cv %%{buildroot}%%{_datadir}/selinux
-%endif
-
-%if 0%{?fedora}
-mkdir -p "%{buildroot}%{_datadir}/icinga2-studio"
-install -p -m 644 icinga-studio/icinga.ico %{buildroot}%{_datadir}/icinga2-studio
-
-mkdir -p "%{buildroot}%{_datadir}/applications"
-echo "[Desktop Entry]
-Name=Icinga 2 Studio
-Comment=API viewer for Icinga 2
-TryExec=icinga-studio
-Exec=icinga-studio
-Icon=/usr/share/icinga2-studio/icinga.ico
-StartupNotify=true
-Terminal=false
-Type=Application
-Categories=GTK;Utility;
-Keywords=Monitoring;" > %{buildroot}%{_datadir}/applications/icinga2-studio.desktop
 %endif
 
 %if "%{_vendor}" == "suse"
@@ -726,14 +696,6 @@ fi
 %{_datadir}/selinux/*/%{selinux_modulename}.pp
 %endif
 
-%if 0%{?fedora}
-%files studio
-%defattr(-,root,root,-)
-%{_bindir}/icinga-studio
-%{_datadir}/icinga2-studio
-%{_datadir}/applications/icinga2-studio.desktop
-%endif
-
 %files -n vim-icinga2
 %defattr(-,root,root,-)
 %if "%{_vendor}" == "suse"
@@ -752,6 +714,10 @@ fi
 %{_datadir}/nano/%{name}.nanorc
 
 %changelog
+* Tue Feb 06 2018 Markus Frosch <markus.frosch@icinga.com> 2.9.0-0
+- Preparing snapshot update to 2.9.0
+- Remove icinga2-studio
+
 * Wed Jan 17 2018 Gunnar Beutner <gunnar.beutner@icinga.com> 2.8.1-1
 - Update to 2.8.1
 
