@@ -287,6 +287,10 @@ Provides Nano syntax highlighting for icinga2.
 
 %prep
 %setup -q -n %{name}-%{version}
+# use absolute shebang instead of env on SUSE distributions
+%if "%{_vendor}" == "suse"
+find . -type f -name '*.sh' -exec sed -i -e 's|\/usr\/bin\/env bash|\/bin\/bash|g' {} \;
+%endif
 
 %build
 CMAKE_OPTS="-DCMAKE_INSTALL_PREFIX=/usr \
