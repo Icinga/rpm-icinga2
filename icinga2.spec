@@ -127,9 +127,6 @@ BuildRequires: cmake
 BuildRequires: flex >= 2.5.35
 BuildRequires: bison
 BuildRequires: make
-%if 0%{?fedora}
-BuildRequires: wxGTK3-devel
-%endif
 
 %if 0%{?build_icinga_org} && "%{_vendor}" == "redhat" && (0%{?el5} || 0%{?rhel} == 5 || "%{?dist}" == ".el5" || 0%{?el6} || 0%{?rhel} == 6 || "%{?dist}" == ".el6")
 # el5 and el6 require packages.icinga.com
