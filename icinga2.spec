@@ -378,8 +378,13 @@ rm -f %{buildroot}/%{_sysconfdir}/%{name}/features-enabled/*.conf
 %else
   ln -sf ../../%{_initrddir}/%{name} "%{buildroot}%{_sbindir}/rc%{name}"
 %endif
+%if ( 0%{?sle_version} >= 150000 && 0%{?is_opensuse} ) || 0%{?suse_version} > 1500
+mkdir -p "%{buildroot}%{_fillupdir}/"
+mv "%{buildroot}%{_sysconfdir}/sysconfig/%{name}" "%{buildroot}%{_fillupdir}/sysconfig.%{name}"
+%else
 mkdir -p "%{buildroot}%{_localstatedir}/adm/fillup-templates/"
 mv "%{buildroot}%{_sysconfdir}/sysconfig/%{name}" "%{buildroot}%{_localstatedir}/adm/fillup-templates/sysconfig.%{name}"
+%endif
 %endif
 
 %if 0%{?use_selinux}
@@ -632,7 +637,11 @@ fi
 %endif
 %if "%{_vendor}" == "suse"
 %{_sbindir}/rc%{name}
+%if ( 0%{?sle_version} >= 150000 && 0%{?is_opensuse} ) || 0%{?suse_version} > 1500
+%{_fillupdir}/sysconfig.%{name}
+%else
 %{_localstatedir}/adm/fillup-templates/sysconfig.%{name}
+%endif
 %else
 %config(noreplace) %{_sysconfdir}/sysconfig/%{name}
 %endif
