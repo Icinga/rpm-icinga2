@@ -673,13 +673,12 @@ fi
 %attr(0750,%{icinga_user},%{icingacmd_group}) %dir %{_localstatedir}/log/%{name}/compat
 %attr(0750,%{icinga_user},%{icingacmd_group}) %dir %{_localstatedir}/log/%{name}/compat/archives
 %attr(0750,%{icinga_user},%{icinga_group}) %{_localstatedir}/lib/%{name}
-%attr(0750,%{icinga_user},%{icingacmd_group}) %ghost %{_rundir}/%{name}
+%attr(0750,%{icinga_user},%{icingacmd_group}) %ghost %dir %{_rundir}/%{name}
 %attr(2750,%{icinga_user},%{icingacmd_group}) %ghost %{_rundir}/%{name}/cmd
 %attr(0750,%{icinga_user},%{icinga_group}) %dir %{_localstatedir}/spool/%{name}
 %attr(0770,%{icinga_user},%{icinga_group}) %dir %{_localstatedir}/spool/%{name}/perfdata
 %attr(0750,%{icinga_user},%{icinga_group}) %dir %{_localstatedir}/spool/%{name}/tmp
-%attr(0750,%{icinga_user},%{icinga_group}) %dir %{_datadir}/%{name}/include
-%{_datadir}/%{name}/include
+%attr(0750,%{icinga_user},%{icinga_group}) %{_datadir}/%{name}/include
 
 %files doc
 %defattr(-,root,root,-)
