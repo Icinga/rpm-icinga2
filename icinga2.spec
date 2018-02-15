@@ -81,7 +81,7 @@ Summary:        Network monitoring application
 Name:           icinga2
 Version:        2.8.1
 Release:        %{revision}%{?dist}
-License:        GPLv2+
+License:        GPL-2.0+
 Url:            https://www.icinga.com/
 Group:          System/Monitoring
 Source:         https://github.com/Icinga/%{name}/archive/v%{version}.tar.gz
