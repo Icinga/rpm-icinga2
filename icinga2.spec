@@ -260,7 +260,7 @@ Requires(post):   policycoreutils-python
 Requires(postun): policycoreutils-python
 
 %description selinux
-SELinux policy module supporting icinga2
+SELinux policy module supporting icinga2.
 %endif
 
 %package -n vim-icinga2
@@ -274,7 +274,7 @@ Requires:       vim-filesystem
 %endif
 
 %description -n vim-icinga2
-Vim syntax highlighting for icinga2
+Provides Vim syntax highlighting for icinga2.
 
 
 %package -n nano-icinga2
@@ -283,7 +283,7 @@ Group:          Productivity/Text/Editors
 Requires:       nano
 
 %description -n nano-icinga2
-Nano syntax highlighting for icinga2
+Provides Nano syntax highlighting for icinga2.
 
 %prep
 %setup -q -n %{name}-%{version}
