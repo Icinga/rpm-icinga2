@@ -97,7 +97,6 @@ Summary:        Icinga 2 binaries and libraries
 Group:          System/Monitoring
 
 %if "%{_vendor}" == "suse"
-PreReq:         permissions
 Provides:       monitoring_daemon
 Recommends:     monitoring-plugins
 %if 0%{?suse_version} >= 1310
@@ -172,6 +171,7 @@ Requires(post): shadow-utils
 %endif
 BuildRequires:  logrotate
 %if "%{_vendor}" == "suse"
+PreReq:         permissions
 Provides:       user(%{icinga_user})
 Provides:       group(%{icinga_group})
 Provides:       group(%{icingacmd_group})
@@ -424,27 +424,18 @@ getent passwd %{icinga_user} >/dev/null || %{_sbindir}/useradd -c "icinga" -s /s
 %if 0%{?use_systemd}
   %service_add_pre %{name}.service
 %endif
-%endif
 
-%if "%{_vendor}" == "suse"
-%verifyscript bin
+%verifyscript common
 %verify_permissions -e %{_rundir}/%{name}/cmd
 %endif
-
-%post bin
-
-# suse
-%if "%{_vendor}" == "suse"
-
-%if 0%{?suse_version} >= 1310
-%set_permissions %{_rundir}/%{name}/cmd
-%endif
-
-%endif #suse/rhel
 
 %post common
 # suse
 %if "%{_vendor}" == "suse"
+%if 0%{?suse_version} >= 1310
+%set_permissions %{_rundir}/%{name}/cmd
+%endif
+
 %if 0%{?use_systemd}
 %fillup_only  %{name}
 %service_add_post %{name}.service
