@@ -677,7 +677,8 @@ fi
 %attr(0750,%{icinga_user},%{icinga_group}) %dir %{_localstatedir}/spool/%{name}
 %attr(0770,%{icinga_user},%{icinga_group}) %dir %{_localstatedir}/spool/%{name}/perfdata
 %attr(0750,%{icinga_user},%{icinga_group}) %dir %{_localstatedir}/spool/%{name}/tmp
-%attr(0750,%{icinga_user},%{icinga_group}) %{_datadir}/%{name}/include
+%attr(0750,%{icinga_user},%{icinga_group}) %dir %{_datadir}/%{name}/include
+%{_datadir}/%{name}/include/*
 
 %files doc
 %defattr(-,root,root,-)
