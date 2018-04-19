@@ -302,6 +302,7 @@ CMAKE_OPTS="-DCMAKE_INSTALL_PREFIX=/usr \
          -DBoost_NO_BOOST_CMAKE=ON \
          -DICINGA2_PLUGINDIR=%{plugindir} \
          -DICINGA2_RUNDIR=%{_rundir} \
+         -DICINGA2_SYSCONFIGFILE=/etc/sysconfig/icinga2 \
          -DICINGA2_USER=%{icinga_user} \
          -DICINGA2_GROUP=%{icinga_group} \
          -DICINGA2_COMMAND_GROUP=%{icingacmd_group}"
