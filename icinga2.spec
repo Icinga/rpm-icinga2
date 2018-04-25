@@ -79,7 +79,7 @@
 
 Summary: Network monitoring application
 Name: icinga2
-Version: 2.8.3
+Version: 2.8.4
 Release: %{revision}%{?dist}
 License: GPLv2+
 URL: https://www.icinga.com/
@@ -741,6 +741,9 @@ fi
 %{_datadir}/nano/%{name}.nanorc
 
 %changelog
+* Wed Apr 25 2018 Jean Flach <jean.flach@icinga.com> 2.8.4-1
+- Update to 2.8.4
+
 * Tue Apr 24 2018 Jean Flach <jean.flach@icinga.com> 2.8.3-1
 - Update to 2.8.3
 
