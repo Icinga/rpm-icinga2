@@ -611,7 +611,7 @@ fi
 
 %files libs
 %defattr(-,root,root,-)
-%doc COPYING Exceptions README.md NEWS AUTHORS CHANGELOG.md
+%doc COPYING README.md NEWS AUTHORS CHANGELOG.md
 %exclude %{_libdir}/%{name}/libmysql_shim*
 %exclude %{_libdir}/%{name}/libpgsql_shim*
 %dir %{_libdir}/%{name}
