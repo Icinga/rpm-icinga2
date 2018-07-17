@@ -77,97 +77,104 @@
 
 %define logmsg logger -t %{name}/rpm
 
-Summary: Network monitoring application
-Name: icinga2
-Version: 2.8.4
-Release: %{revision}%{?dist}
-License: GPLv2+
-URL: https://www.icinga.com/
-Group: System/Monitoring
-Source: https://github.com/Icinga/%{name}/archive/v%{version}.tar.gz
+Summary:        Network monitoring application
+Name:           icinga2
+Version:        2.9.0
+Release:        %{revision}%{?dist}
+License:        GPL-2.0+
+Url:            https://www.icinga.com/
+Group:          System/Monitoring
+Source:         https://github.com/Icinga/%{name}/archive/v%{version}.tar.gz
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
-Requires: %{name}-bin = %{version}-%{release}
+Requires:       %{name}-bin = %{version}-%{release}
 
 %description
 Meta package for Icinga 2 Core, DB IDO and Web.
 
 %package bin
-Summary:      Icinga 2 binaries and libraries
-Group:        System/Monitoring
+Summary:        Icinga 2 binaries and libraries
+Group:          System/Monitoring
 
 %if "%{_vendor}" == "suse"
-PreReq:        permissions
-Provides:      monitoring_daemon
-Recommends:    monitoring-plugins
+Provides:       monitoring_daemon
+Recommends:     monitoring-plugins
 %if 0%{?suse_version} >= 1310
-BuildRequires: libyajl-devel
+BuildRequires:  libyajl-devel
 %endif
 %endif
-BuildRequires: libedit-devel
-BuildRequires: ncurses-devel
+BuildRequires:  libedit-devel
+BuildRequires:  ncurses-devel
 %if "%{_vendor}" == "suse" && 0%{?suse_version} < 1210
-BuildRequires: gcc48-c++
-BuildRequires: libstdc++48-devel
-BuildRequires: libopenssl1-devel
+BuildRequires:  gcc48-c++
+BuildRequires:  libopenssl1-devel
+BuildRequires:  libstdc++48-devel
 %else
 %if "%{_vendor}" == "redhat" && (0%{?el5} || 0%{?rhel} == 5 || "%{?dist}" == ".el5" || 0%{?el6} || 0%{?rhel} == 6 || "%{?dist}" == ".el6")
 # Requires devtoolset-2 scl
-BuildRequires: devtoolset-2-gcc-c++
-BuildRequires: devtoolset-2-libstdc++-devel
-BuildRequires: devtoolset-2-binutils
+BuildRequires:  devtoolset-2-binutils
+BuildRequires:  devtoolset-2-gcc-c++
+BuildRequires:  devtoolset-2-libstdc++-devel
 %define scl_enable scl enable devtoolset-2 --
 %else
-BuildRequires: gcc-c++
-BuildRequires: libstdc++-devel
+BuildRequires:  gcc-c++
+BuildRequires:  libstdc++-devel
 %endif
-BuildRequires: openssl-devel
+BuildRequires:  openssl-devel
 %endif
-BuildRequires: cmake
-BuildRequires: flex >= 2.5.35
-BuildRequires: bison
-BuildRequires: make
-%if 0%{?fedora}
-BuildRequires: wxGTK3-devel
-%endif
+BuildRequires:  bison
+BuildRequires:  cmake
+BuildRequires:  flex >= 2.5.35
+BuildRequires:  make
 
 %if 0%{?build_icinga_org} && "%{_vendor}" == "redhat" && (0%{?el5} || 0%{?rhel} == 5 || "%{?dist}" == ".el5" || 0%{?el6} || 0%{?rhel} == 6 || "%{?dist}" == ".el6")
 # el5 and el6 require packages.icinga.com
-BuildRequires: boost153-devel
+BuildRequires:  boost153-devel
 %else
 %if 0%{?build_icinga_org} && "%{_vendor}" == "suse" && 0%{?suse_version} < 1310
 # sles 11 sp3 requires packages.icinga.com
-BuildRequires: boost153-devel
+BuildRequires:  boost153-devel
+%else
+%if "%{_vendor}" == "suse" && 0%{?suse_version} > 1320
+BuildRequires:  libboost_program_options-devel >= 1.48
+BuildRequires:  libboost_regex-devel >= 1.48
+BuildRequires:  libboost_system-devel >= 1.48
+BuildRequires:  libboost_thread-devel >= 1.48
 %else
 %if (0%{?el5} || 0%{?rhel} == 5 || "%{?dist}" == ".el5" || 0%{?el6} || 0%{?rhel} == 6 || "%{?dist}" == ".el6")
 # Requires EPEL repository
-BuildRequires: boost148-devel >= 1.48
+BuildRequires:  boost148-devel >= 1.48
 %else
-BuildRequires: boost-devel >= 1.48
+BuildRequires:  boost-devel >= 1.48
+%endif
 %endif
 %endif
 %endif
 
 %if 0%{?use_systemd}
-BuildRequires: systemd
-Requires: systemd
+BuildRequires:  systemd-devel
+Requires:       systemd
 %endif
 
-Requires: %{name}-libs = %{version}-%{release}
+Requires:       %{name}-libs = %{version}-%{release}
 
 %description bin
 Icinga 2 is a general-purpose network monitoring application.
 This subpackage provides the binaries for Icinga 2 Core.
 
 %package common
-Summary:      Common Icinga 2 configuration
-Group:        System/Monitoring
+Summary:        Common Icinga 2 configuration
+Group:          System/Monitoring
 %if (0%{?amzn} || 0%{?fedora} || 0%{?rhel})
 Requires(pre):  shadow-utils
 Requires(post): shadow-utils
 %endif
 BuildRequires:  logrotate
 %if "%{_vendor}" == "suse"
+PreReq:         permissions
+Provides:       user(%{icinga_user})
+Provides:       group(%{icinga_group})
+Provides:       group(%{icingacmd_group})
 Requires(pre):  shadow
 Requires(post): shadow
 # Coreutils is added because of autoyast problems reported
@@ -188,36 +195,36 @@ among Icinga 2 related packages.
 
 
 %package doc
-Summary:      Documentation for Icinga 2
-Group:        Documentation/Other
+Summary:        Documentation for Icinga 2
+Group:          Documentation/Other
 
 %description doc
 This subpackage provides documentation for Icinga 2.
 
 
 %package libs
-Summary:      Libraries for Icinga 2
-Group:        System/Libraries
-Requires:     %{name}-common = %{version}-%{release}
+Summary:        Libraries for Icinga 2
+Group:          System/Libraries
+Requires:       %{name}-common = %{version}-%{release}
 
 %description libs
-This subpackage provides the internal libraries for the daemon or studio.
+This subpackage provides the internal libraries for the daemon.
 
 
 %package ido-mysql
-Summary:      IDO MySQL database backend for Icinga 2
-Group:        System/Monitoring
+Summary:        IDO MySQL database backend for Icinga 2
+Group:          System/Monitoring
 %if "%{_vendor}" == "suse"
-BuildRequires: libmysqlclient-devel
+BuildRequires:  libmysqlclient-devel
 %if 0%{?suse_version} >= 1310
-BuildRequires: mysql-devel
+BuildRequires:  mysql-devel
 %endif
 
 %else
-BuildRequires: mysql-devel
+BuildRequires:  mysql-devel
 %endif #suse
 
-Requires: %{name} = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 
 %description ido-mysql
 Icinga 2 IDO mysql database backend. Compatible with Icinga 1.x
@@ -225,14 +232,14 @@ IDOUtils schema >= 1.12
 
 
 %package ido-pgsql
-Summary:      IDO PostgreSQL database backend for Icinga 2
-Group:        System/Monitoring
+Summary:        IDO PostgreSQL database backend for Icinga 2
+Group:          System/Monitoring
 %if "%{_vendor}" == "suse" && 0%{?suse_version} < 1210
-BuildRequires: postgresql-devel >= 8.4
+BuildRequires:  postgresql-devel >= 8.4
 %else
-BuildRequires: postgresql-devel
+BuildRequires:  postgresql-devel
 %endif
-Requires: %{name} = %{version}-%{release}
+Requires:       %{name} = %{version}-%{release}
 
 %description ido-pgsql
 Icinga 2 IDO PostgreSQL database backend. Compatible with Icinga 1.x
@@ -245,52 +252,45 @@ IDOUtils schema >= 1.12
 %package selinux
 Summary:        SELinux policy module supporting icinga2
 Group:          System/Base
-BuildRequires:  checkpolicy, selinux-policy-devel, hardlink
+BuildRequires:  checkpolicy
+BuildRequires:  hardlink
+BuildRequires:  selinux-policy-devel
 Requires:       %{name} = %{version}-%{release}
 Requires(post):   policycoreutils-python
 Requires(postun): policycoreutils-python
 
 %description selinux
-SELinux policy module supporting icinga2
+SELinux policy module supporting icinga2.
 %endif
-
-
-%if 0%{?fedora}
-%package studio
-Summary:      Studio for Icinga 2
-Group:        System/Monitoring
-Requires:     %{name}-libs = %{version}-%{release}
-Requires:     wxGTK3
-
-%description studio
-Provides a GUI for the Icinga 2 API.
-%endif
-
 
 %package -n vim-icinga2
-Summary:      Vim syntax highlighting for icinga2
-Group:        Productivity/Text/Editors
+Summary:        Vim syntax highlighting for icinga2
+Group:          Productivity/Text/Editors
 %if "%{_vendor}" == "suse"
-BuildRequires: vim
-Requires:      vim
+BuildRequires:  vim
+Requires:       vim
 %else
-Requires:      vim-filesystem
+Requires:       vim-filesystem
 %endif
 
 %description -n vim-icinga2
-Vim syntax highlighting for icinga2
+Provides Vim syntax highlighting for icinga2.
 
 
 %package -n nano-icinga2
-Summary:       Nano syntax highlighting for icinga2
-Group:         Productivity/Text/Editors
-Requires:      nano
+Summary:        Nano syntax highlighting for icinga2
+Group:          Productivity/Text/Editors
+Requires:       nano
 
 %description -n nano-icinga2
-Nano syntax highlighting for icinga2
+Provides Nano syntax highlighting for icinga2.
 
 %prep
 %setup -q -n %{name}-%{version}
+# use absolute shebang instead of env on SUSE distributions
+%if "%{_vendor}" == "suse"
+find . -type f -name '*.sh' -exec sed -i -e 's|\/usr\/bin\/env bash|\/bin\/bash|g' {} \;
+%endif
 
 %build
 CMAKE_OPTS="-DCMAKE_INSTALL_PREFIX=/usr \
@@ -302,6 +302,7 @@ CMAKE_OPTS="-DCMAKE_INSTALL_PREFIX=/usr \
          -DBoost_NO_BOOST_CMAKE=ON \
          -DICINGA2_PLUGINDIR=%{plugindir} \
          -DICINGA2_RUNDIR=%{_rundir} \
+         -DICINGA2_SYSCONFIGFILE=/etc/sysconfig/icinga2 \
          -DICINGA2_USER=%{icinga_user} \
          -DICINGA2_GROUP=%{icinga_group} \
          -DICINGA2_COMMAND_GROUP=%{icingacmd_group}"
@@ -364,7 +365,7 @@ cd -
 
 %install
 make install \
-        DESTDIR="%{buildroot}"
+	DESTDIR="%{buildroot}"
 
 # install custom limits.conf for systemd
 %if 0%{?configure_systemd_limits}
@@ -382,8 +383,13 @@ rm -f %{buildroot}/%{_sysconfdir}/%{name}/features-enabled/*.conf
 %else
   ln -sf ../../%{_initrddir}/%{name} "%{buildroot}%{_sbindir}/rc%{name}"
 %endif
+%if ( 0%{?sle_version} >= 150000 && 0%{?is_opensuse} ) || 0%{?suse_version} > 1500
+mkdir -p "%{buildroot}%{_fillupdir}/"
+mv "%{buildroot}%{_sysconfdir}/sysconfig/%{name}" "%{buildroot}%{_fillupdir}/sysconfig.%{name}"
+%else
 mkdir -p "%{buildroot}%{_localstatedir}/adm/fillup-templates/"
 mv "%{buildroot}%{_sysconfdir}/sysconfig/%{name}" "%{buildroot}%{_localstatedir}/adm/fillup-templates/sysconfig.%{name}"
+%endif
 %endif
 
 %if 0%{?use_selinux}
@@ -398,24 +404,6 @@ cd -
 
 # TODO: Fix build problems on Icinga, see https://github.com/Icinga/puppet-icinga_build/issues/11
 #/usr/sbin/hardlink -cv %%{buildroot}%%{_datadir}/selinux
-%endif
-
-%if 0%{?fedora}
-mkdir -p "%{buildroot}%{_datadir}/icinga2-studio"
-install -p -m 644 icinga-studio/icinga.ico %{buildroot}%{_datadir}/icinga2-studio
-
-mkdir -p "%{buildroot}%{_datadir}/applications"
-echo "[Desktop Entry]
-Name=Icinga 2 Studio
-Comment=API viewer for Icinga 2
-TryExec=icinga-studio
-Exec=icinga-studio
-Icon=/usr/share/icinga2-studio/icinga.ico
-StartupNotify=true
-Terminal=false
-Type=Application
-Categories=GTK;Utility;
-Keywords=Monitoring;" > %{buildroot}%{_datadir}/applications/icinga2-studio.desktop
 %endif
 
 %if "%{_vendor}" == "suse"
@@ -437,27 +425,18 @@ getent passwd %{icinga_user} >/dev/null || %{_sbindir}/useradd -c "icinga" -s /s
 %if 0%{?use_systemd}
   %service_add_pre %{name}.service
 %endif
-%endif
 
-%if "%{_vendor}" == "suse"
-%verifyscript bin
+%verifyscript common
 %verify_permissions -e %{_rundir}/%{name}/cmd
 %endif
-
-%post bin
-
-# suse
-%if "%{_vendor}" == "suse"
-
-%if 0%{?suse_version} >= 1310
-%set_permissions %{_rundir}/%{name}/cmd
-%endif
-
-%endif #suse/rhel
 
 %post common
 # suse
 %if "%{_vendor}" == "suse"
+%if 0%{?suse_version} >= 1310
+%set_permissions %{_rundir}/%{name}/cmd
+%endif
+
 %if 0%{?use_systemd}
 %fillup_only  %{name}
 %service_add_post %{name}.service
@@ -467,10 +446,10 @@ getent passwd %{icinga_user} >/dev/null || %{_sbindir}/useradd -c "icinga" -s /s
 
 if [ ${1:-0} -eq 1 ]
 then
-        # initial installation, enable default features
-        for feature in checker notification mainlog; do
-                ln -sf ../features-available/${feature}.conf %{_sysconfdir}/%{name}/features-enabled/${feature}.conf
-        done
+	# initial installation, enable default features
+	for feature in checker notification mainlog; do
+		ln -sf ../features-available/${feature}.conf %{_sysconfdir}/%{name}/features-enabled/${feature}.conf
+	done
 fi
 
 exit 0
@@ -486,10 +465,10 @@ exit 0
 
 if [ ${1:-0} -eq 1 ]
 then
-        # initial installation, enable default features
-        for feature in checker notification mainlog; do
-                ln -sf ../features-available/${feature}.conf %{_sysconfdir}/%{name}/features-enabled/${feature}.conf
-        done
+	# initial installation, enable default features
+	for feature in checker notification mainlog; do
+		ln -sf ../features-available/${feature}.conf %{_sysconfdir}/%{name}/features-enabled/${feature}.conf
+	done
 fi
 
 exit 0
@@ -514,7 +493,7 @@ exit 0
 %systemd_postun_with_restart %{name}.service
 %else
 if [ "$1" -ge  "1" ]; then
-        /sbin/service %{name} condrestart >/dev/null 2>&1 || :
+	/sbin/service %{name} condrestart >/dev/null 2>&1 || :
 fi
 %endif
 
@@ -522,8 +501,8 @@ fi
 # suse / rhel
 
 if [ "$1" = "0" ]; then
-        # deinstallation of the package - remove enabled features
-        rm -rf %{_sysconfdir}/%{name}/features-enabled
+	# deinstallation of the package - remove enabled features
+	rm -rf %{_sysconfdir}/%{name}/features-enabled
 fi
 
 exit 0
@@ -547,8 +526,8 @@ exit 0
 %systemd_preun %{name}.service
 %else
 if [ "$1" = "0" ]; then
-        /sbin/service %{name} stop > /dev/null 2>&1 || :
-        /sbin/chkconfig --del %{name} || :
+	/sbin/service %{name} stop > /dev/null 2>&1 || :
+	/sbin/chkconfig --del %{name} || :
 fi
 %endif
 
@@ -560,16 +539,16 @@ exit 0
 %post ido-mysql
 if [ ${1:-0} -eq 1 ]
 then
-        # initial installation, enable ido-mysql feature
-        ln -sf ../features-available/ido-mysql.conf %{_sysconfdir}/%{name}/features-enabled/ido-mysql.conf
+	# initial installation, enable ido-mysql feature
+	ln -sf ../features-available/ido-mysql.conf %{_sysconfdir}/%{name}/features-enabled/ido-mysql.conf
 fi
 
 exit 0
 
 %postun ido-mysql
 if [ "$1" = "0" ]; then
-        # deinstallation of the package - remove feature
-        rm -f %{_sysconfdir}/%{name}/features-enabled/ido-mysql.conf
+	# deinstallation of the package - remove feature
+	rm -f %{_sysconfdir}/%{name}/features-enabled/ido-mysql.conf
 fi
 
 exit 0
@@ -577,16 +556,16 @@ exit 0
 %post ido-pgsql
 if [ ${1:-0} -eq 1 ]
 then
-        # initial installation, enable ido-pgsql feature
-        ln -sf ../features-available/ido-pgsql.conf %{_sysconfdir}/%{name}/features-enabled/ido-pgsql.conf
+	# initial installation, enable ido-pgsql feature
+	ln -sf ../features-available/ido-pgsql.conf %{_sysconfdir}/%{name}/features-enabled/ido-pgsql.conf
 fi
 
 exit 0
 
 %postun ido-pgsql
 if [ "$1" = "0" ]; then
-        # deinstallation of the package - remove feature
-        rm -f %{_sysconfdir}/%{name}/features-enabled/ido-pgsql.conf
+	# deinstallation of the package - remove feature
+	rm -f %{_sysconfdir}/%{name}/features-enabled/ido-pgsql.conf
 fi
 
 exit 0
@@ -621,7 +600,7 @@ fi
 
 %files bin
 %defattr(-,root,root,-)
-%doc COPYING COPYING.Exceptions README.md NEWS AUTHORS CHANGELOG.md
+%doc COPYING README.md NEWS AUTHORS CHANGELOG.md
 %{_sbindir}/%{name}
 %dir %{_libdir}/%{name}/sbin
 %{_libdir}/%{name}/sbin/%{name}
@@ -632,15 +611,15 @@ fi
 
 %files libs
 %defattr(-,root,root,-)
-%doc COPYING COPYING.Exceptions README.md NEWS AUTHORS CHANGELOG.md
-%exclude %{_libdir}/%{name}/libdb_ido_mysql*
-%exclude %{_libdir}/%{name}/libdb_ido_pgsql*
+%doc COPYING README.md NEWS AUTHORS CHANGELOG.md
+%exclude %{_libdir}/%{name}/libmysql_shim*
+%exclude %{_libdir}/%{name}/libpgsql_shim*
 %dir %{_libdir}/%{name}
 %{_libdir}/%{name}/*.so*
 
 %files common
 %defattr(-,root,root,-)
-%doc COPYING COPYING.Exceptions README.md NEWS AUTHORS CHANGELOG.md tools/syntax
+%doc COPYING README.md NEWS AUTHORS CHANGELOG.md tools/syntax
 %config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
 %{_sysconfdir}/bash_completion.d/%{name}
 %if 0%{?use_systemd}
@@ -654,7 +633,11 @@ fi
 %endif
 %if "%{_vendor}" == "suse"
 %{_sbindir}/rc%{name}
+%if ( 0%{?sle_version} >= 150000 && 0%{?is_opensuse} ) || 0%{?suse_version} > 1500
+%{_fillupdir}/sysconfig.%{name}
+%else
 %{_localstatedir}/adm/fillup-templates/sysconfig.%{name}
+%endif
 %else
 %config(noreplace) %{_sysconfdir}/sysconfig/%{name}
 %endif
@@ -681,13 +664,13 @@ fi
 %attr(0750,%{icinga_user},%{icingacmd_group}) %dir %{_localstatedir}/log/%{name}/compat
 %attr(0750,%{icinga_user},%{icingacmd_group}) %dir %{_localstatedir}/log/%{name}/compat/archives
 %attr(0750,%{icinga_user},%{icinga_group}) %{_localstatedir}/lib/%{name}
-%attr(0750,%{icinga_user},%{icingacmd_group}) %ghost %{_rundir}/%{name}
+%attr(0750,%{icinga_user},%{icingacmd_group}) %ghost %dir %{_rundir}/%{name}
 %attr(2750,%{icinga_user},%{icingacmd_group}) %ghost %{_rundir}/%{name}/cmd
 %attr(0750,%{icinga_user},%{icinga_group}) %dir %{_localstatedir}/spool/%{name}
 %attr(0770,%{icinga_user},%{icinga_group}) %dir %{_localstatedir}/spool/%{name}/perfdata
 %attr(0750,%{icinga_user},%{icinga_group}) %dir %{_localstatedir}/spool/%{name}/tmp
 %attr(0750,%{icinga_user},%{icinga_group}) %dir %{_datadir}/%{name}/include
-%{_datadir}/%{name}/include
+%{_datadir}/%{name}/include/*
 
 %files doc
 %defattr(-,root,root,-)
@@ -696,16 +679,16 @@ fi
 
 %files ido-mysql
 %defattr(-,root,root,-)
-%doc COPYING COPYING.Exceptions README.md NEWS AUTHORS CHANGELOG.md
+%doc COPYING README.md NEWS AUTHORS CHANGELOG.md
 %config(noreplace) %attr(0640,%{icinga_user},%{icinga_group}) %{_sysconfdir}/%{name}/features-available/ido-mysql.conf
-%{_libdir}/%{name}/libdb_ido_mysql*
+%{_libdir}/%{name}/libmysql_shim*
 %{_datadir}/icinga2-ido-mysql
 
 %files ido-pgsql
 %defattr(-,root,root,-)
-%doc COPYING COPYING.Exceptions README.md NEWS AUTHORS CHANGELOG.md
+%doc COPYING README.md NEWS AUTHORS CHANGELOG.md
 %config(noreplace) %attr(0640,%{icinga_user},%{icinga_group}) %{_sysconfdir}/%{name}/features-available/ido-pgsql.conf
-%{_libdir}/%{name}/libdb_ido_pgsql*
+%{_libdir}/%{name}/libpgsql_shim*
 %{_datadir}/icinga2-ido-pgsql
 
 %if 0%{?use_selinux}
@@ -713,14 +696,6 @@ fi
 %defattr(-,root,root,0755)
 %doc tools/selinux/*
 %{_datadir}/selinux/*/%{selinux_modulename}.pp
-%endif
-
-%if 0%{?fedora}
-%files studio
-%defattr(-,root,root,-)
-%{_bindir}/icinga-studio
-%{_datadir}/icinga2-studio
-%{_datadir}/applications/icinga2-studio.desktop
 %endif
 
 %files -n vim-icinga2
@@ -741,6 +716,9 @@ fi
 %{_datadir}/nano/%{name}.nanorc
 
 %changelog
+* Tue Jul 17 2018 Michael Friedrich <michael.friedrich@icinga.com> 2.9.0-1
+- Update to 2.9.0
+
 * Wed Apr 25 2018 Jean Flach <jean.flach@icinga.com> 2.8.4-1
 - Update to 2.8.4
 
