@@ -1,0 +1,12 @@
+## Build
+/build/
+/ccache/
+
+## Snapshot Artifacts
+/*.git/
+/*.tar*
+/*.version
+
+## Editors
+*~
+.*.sw[op]
