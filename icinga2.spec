@@ -285,6 +285,10 @@ find . -type f -name '*.sh' -exec sed -i -e 's|\/usr\/bin\/env bash|\/bin\/bash|
 %endif
 
 %build
+# set basedir to allow cache to hit between different builds
+# this will make all paths below BUILD/icinga2-x.x.x relative for cache
+export CCACHE_BASEDIR="${CCACHE_BASEDIR:-$(pwd)}"
+
 CMAKE_OPTS="-DCMAKE_INSTALL_PREFIX=/usr \
          -DCMAKE_INSTALL_SYSCONFDIR=/etc \
          -DCMAKE_INSTALL_LOCALSTATEDIR=/var \
