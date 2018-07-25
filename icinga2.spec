@@ -17,7 +17,7 @@
 # * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.             *
 # ******************************************************************************/
 
-%define revision 1
+%define revision 0
 
 # make sure that _rundir is working on older systems
 %if ! %{defined _rundir}
@@ -79,7 +79,7 @@
 
 Summary:        Network monitoring application
 Name:           icinga2
-Version:        2.9.1
+Version:        2.10.0
 Release:        %{revision}%{?dist}
 License:        GPL-2.0+
 Url:            https://www.icinga.com/
