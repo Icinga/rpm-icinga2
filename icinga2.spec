@@ -156,7 +156,8 @@ BuildRequires:  systemd-devel
 Requires:       systemd
 %endif
 
-Requires:       %{name}-libs = %{version}-%{release}
+Obsoletes:       %{name}-libs <= 2.10.0
+Conflicts:       %{name}-libs <= 2.10.0
 
 %description bin
 Icinga 2 is a general-purpose network monitoring application.
@@ -200,15 +201,6 @@ Group:          Documentation/Other
 
 %description doc
 This subpackage provides documentation for Icinga 2.
-
-
-%package libs
-Summary:        Libraries for Icinga 2
-Group:          System/Libraries
-Requires:       %{name}-common = %{version}-%{release}
-
-%description libs
-This subpackage provides the internal libraries for the daemon.
 
 
 %package ido-mysql
@@ -609,14 +601,6 @@ fi
 %exclude %{_datadir}/%{name}/include
 %{_mandir}/man8/%{name}.8.gz
 
-%files libs
-%defattr(-,root,root,-)
-%doc COPYING README.md NEWS AUTHORS CHANGELOG.md
-%exclude %{_libdir}/%{name}/libmysql_shim*
-%exclude %{_libdir}/%{name}/libpgsql_shim*
-%dir %{_libdir}/%{name}
-%{_libdir}/%{name}/*.so*
-
 %files common
 %defattr(-,root,root,-)
 %doc COPYING README.md NEWS AUTHORS CHANGELOG.md tools/syntax
@@ -716,6 +700,9 @@ fi
 %{_datadir}/nano/%{name}.nanorc
 
 %changelog
+* Wed Jul 25 2018 Markus Frosch <markus.frosch@icinga.com> 2.10.0-0
+- Remove obsoleted icinga2-libs package
+
 * Tue Jul 24 2018 Michael Friedrich <michael.friedrich@icinga.com> 2.9.1-1
 - Update to 2.9.1
 
