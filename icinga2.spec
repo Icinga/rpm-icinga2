@@ -88,6 +88,9 @@ Source:         https://github.com/Icinga/%{name}/archive/v%{version}.tar.gz
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 Requires:       %{name}-bin = %{version}-%{release}
+Requires:       %{name}-common = %{version}-%{release}
+
+Conflicts:      %{name}-common < %{version}-%{release}
 
 %description
 Meta package for Icinga 2 Core, DB IDO and Web.
@@ -216,7 +219,7 @@ BuildRequires:  mysql-devel
 BuildRequires:  mysql-devel
 %endif #suse
 
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}-bin = %{version}-%{release}
 
 %description ido-mysql
 Icinga 2 IDO mysql database backend. Compatible with Icinga 1.x
@@ -231,7 +234,7 @@ BuildRequires:  postgresql-devel >= 8.4
 %else
 BuildRequires:  postgresql-devel
 %endif
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}-bin = %{version}-%{release}
 
 %description ido-pgsql
 Icinga 2 IDO PostgreSQL database backend. Compatible with Icinga 1.x
@@ -247,7 +250,7 @@ Group:          System/Base
 BuildRequires:  checkpolicy
 BuildRequires:  hardlink
 BuildRequires:  selinux-policy-devel
-Requires:       %{name} = %{version}-%{release}
+Requires:       %{name}-bin = %{version}-%{release}
 Requires(post):   policycoreutils-python
 Requires(postun): policycoreutils-python
 
@@ -412,27 +415,16 @@ install -D -m 0644 tools/syntax/vim/ftdetect/%{name}.vim %{buildroot}%{_datadir}
 
 install -D -m 0644 tools/syntax/nano/%{name}.nanorc %{buildroot}%{_datadir}/nano/%{name}.nanorc
 
-%pre common
-getent group %{icinga_group} >/dev/null || %{_sbindir}/groupadd -r %{icinga_group}
-getent group %{icingacmd_group} >/dev/null || %{_sbindir}/groupadd -r %{icingacmd_group}
-getent passwd %{icinga_user} >/dev/null || %{_sbindir}/useradd -c "icinga" -s /sbin/nologin -r -d %{_localstatedir}/spool/%{name} -G %{icingacmd_group} -g %{icinga_group} %{icinga_user}
-
+%pre
 %if "%{_vendor}" == "suse"
 %if 0%{?use_systemd}
   %service_add_pre %{name}.service
 %endif
-
-%verifyscript common
-%verify_permissions -e %{_rundir}/%{name}/cmd
 %endif
 
-%post common
+%post
 # suse
 %if "%{_vendor}" == "suse"
-%if 0%{?suse_version} >= 1310
-%set_permissions %{_rundir}/%{name}/cmd
-%endif
-
 %if 0%{?use_systemd}
 %fillup_only  %{name}
 %service_add_post %{name}.service
@@ -472,7 +464,36 @@ exit 0
 %endif
 # suse/rhel
 
-%postun common
+%preun
+# suse
+%if "%{_vendor}" == "suse"
+
+%if 0%{?use_systemd}
+  %service_del_preun %{name}.service
+%else
+  %stop_on_removal %{name}
+%endif
+
+exit 0
+
+%else
+# rhel
+
+%if 0%{?use_systemd}
+%systemd_preun %{name}.service
+%else
+if [ "$1" = "0" ]; then
+	/sbin/service %{name} stop > /dev/null 2>&1 || :
+	/sbin/chkconfig --del %{name} || :
+fi
+%endif
+
+exit 0
+
+%endif
+# suse / rhel
+
+%postun
 # suse
 %if "%{_vendor}" == "suse"
 %if 0%{?use_systemd}
@@ -503,37 +524,25 @@ fi
 
 exit 0
 
-%preun common
-# suse
+%pre common
+getent group %{icinga_group} >/dev/null || %{_sbindir}/groupadd -r %{icinga_group}
+getent group %{icingacmd_group} >/dev/null || %{_sbindir}/groupadd -r %{icingacmd_group}
+getent passwd %{icinga_user} >/dev/null || %{_sbindir}/useradd -c "icinga" -s /sbin/nologin -r -d %{_localstatedir}/spool/%{name} -G %{icingacmd_group} -g %{icinga_group} %{icinga_user}
+
 %if "%{_vendor}" == "suse"
-
-%if 0%{?use_systemd}
-  %service_del_preun %{name}.service
-%else
-  %stop_on_removal %{name}
+%verifyscript common
+%verify_permissions -e %{_rundir}/%{name}/cmd
 %endif
 
-exit 0
-
-%else
-# rhel
-
-%if 0%{?use_systemd}
-%systemd_preun %{name}.service
-%else
-if [ "$1" = "0" ]; then
-	/sbin/service %{name} stop > /dev/null 2>&1 || :
-	/sbin/chkconfig --del %{name} || :
-fi
+%post common
+%if "%{_vendor}" == "suse"
+%if 0%{?suse_version} >= 1310
+%set_permissions %{_rundir}/%{name}/cmd
 %endif
-
-exit 0
-
 %endif
-# suse / rhel
 
 %post ido-mysql
-if [ ${1:-0} -eq 1 ]
+if [ ${1:-0} -eq 1 ] && [ -e %{_sysconfdir}/%{name}/features-enabled/ido-mysql.conf ]
 then
 	# initial installation, enable ido-mysql feature
 	ln -sf ../features-available/ido-mysql.conf %{_sysconfdir}/%{name}/features-enabled/ido-mysql.conf
@@ -550,7 +559,7 @@ fi
 exit 0
 
 %post ido-pgsql
-if [ ${1:-0} -eq 1 ]
+if [ ${1:-0} -eq 1 ] && [ -e %{_sysconfdir}/%{name}/features-enabled/ido-pgsql.conf ]
 then
 	# initial installation, enable ido-pgsql feature
 	ln -sf ../features-available/ido-pgsql.conf %{_sysconfdir}/%{name}/features-enabled/ido-pgsql.conf
@@ -594,22 +603,8 @@ fi
 %defattr(-,root,root,-)
 %doc COPYING
 
-%files bin
-%defattr(-,root,root,-)
-%doc COPYING README.md NEWS AUTHORS CHANGELOG.md
-%{_sbindir}/%{name}
-%dir %{_libdir}/%{name}/sbin
-%{_libdir}/%{name}/sbin/%{name}
-%{plugindir}/check_nscp_api
-%{_datadir}/%{name}
-%exclude %{_datadir}/%{name}/include
-%{_mandir}/man8/%{name}.8.gz
-
-%files common
-%defattr(-,root,root,-)
-%doc COPYING README.md NEWS AUTHORS CHANGELOG.md tools/syntax
 %config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
-%{_sysconfdir}/bash_completion.d/%{name}
+
 %if 0%{?use_systemd}
 %attr(644,root,root) %{_unitdir}/%{name}.service
 %if 0%{?configure_systemd_limits}
@@ -629,6 +624,13 @@ fi
 %else
 %config(noreplace) %{_sysconfdir}/sysconfig/%{name}
 %endif
+
+%{_sbindir}/%{name}
+
+%dir %{_libexecdir}/%{name}
+%{_libexecdir}/%{name}/prepare-dirs
+%{_libexecdir}/%{name}/safe-reload
+
 %attr(0750,root,%{icinga_group}) %dir %{_sysconfdir}/%{name}
 %attr(0750,%{icinga_user},%{icinga_group}) %dir %{_sysconfdir}/%{name}/conf.d
 %attr(0750,%{icinga_user},%{icinga_group}) %dir %{_sysconfdir}/%{name}/features-available
@@ -643,9 +645,7 @@ fi
 %config(noreplace) %attr(0640,%{icinga_user},%{icinga_group}) %{_sysconfdir}/%{name}/features-available/*.conf
 %config(noreplace) %attr(0640,%{icinga_user},%{icinga_group}) %{_sysconfdir}/%{name}/zones.d/*
 %config(noreplace) %{_sysconfdir}/%{name}/scripts/*
-%dir %{_libexecdir}/%{name}
-%{_libexecdir}/%{name}/prepare-dirs
-%{_libexecdir}/%{name}/safe-reload
+
 %attr(0750,%{icinga_user},%{icingacmd_group}) %{_localstatedir}/cache/%{name}
 %attr(0750,%{icinga_user},%{icingacmd_group}) %dir %{_localstatedir}/log/%{name}
 %attr(0750,%{icinga_user},%{icinga_group}) %dir %{_localstatedir}/log/%{name}/crash
@@ -657,6 +657,21 @@ fi
 %attr(0750,%{icinga_user},%{icinga_group}) %dir %{_localstatedir}/spool/%{name}
 %attr(0770,%{icinga_user},%{icinga_group}) %dir %{_localstatedir}/spool/%{name}/perfdata
 %attr(0750,%{icinga_user},%{icinga_group}) %dir %{_localstatedir}/spool/%{name}/tmp
+
+%files bin
+%defattr(-,root,root,-)
+%doc COPYING README.md NEWS AUTHORS CHANGELOG.md
+%dir %{_libdir}/%{name}/sbin
+%{_libdir}/%{name}/sbin/%{name}
+%{plugindir}/check_nscp_api
+%{_datadir}/%{name}
+%exclude %{_datadir}/%{name}/include
+%{_mandir}/man8/%{name}.8.gz
+
+%files common
+%defattr(-,root,root,-)
+%doc COPYING README.md NEWS AUTHORS CHANGELOG.md tools/syntax
+%{_sysconfdir}/bash_completion.d/%{name}
 %attr(0750,%{icinga_user},%{icinga_group}) %dir %{_datadir}/%{name}/include
 %{_datadir}/%{name}/include/*
 
