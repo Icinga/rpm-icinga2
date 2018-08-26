@@ -99,6 +99,8 @@ Meta package for Icinga 2 Core, DB IDO and Web.
 Summary:        Icinga 2 binaries and libraries
 Group:          System/Monitoring
 
+Requires:       %{name}-bin = %{version}-%{release}
+
 %if "%{_vendor}" == "suse"
 Provides:       monitoring_daemon
 Recommends:     monitoring-plugins
