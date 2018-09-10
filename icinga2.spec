@@ -23,6 +23,9 @@
 %if ! %{defined _rundir}
 %define _rundir %{_localstatedir}/run
 %endif
+%if ! %{defined _fillupdir}
+  %define _fillupdir %{_localstatedir}/adm/fillup-templates
+%endif
 
 %define _libexecdir %{_prefix}/lib/
 %define plugindir %{_libdir}/nagios/plugins
@@ -78,12 +81,12 @@
 %define logmsg logger -t %{name}/rpm
 
 Summary:        Network monitoring application
+License:        GPL-2.0+
+Group:          System/Monitoring
 Name:           icinga2
 Version:        2.10.0
 Release:        %{revision}%{?dist}
-License:        GPL-2.0+
 Url:            https://www.icinga.com/
-Group:          System/Monitoring
 Source:         https://github.com/Icinga/%{name}/archive/v%{version}.tar.gz
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
@@ -178,9 +181,9 @@ Requires(post): shadow-utils
 BuildRequires:  logrotate
 %if "%{_vendor}" == "suse"
 PreReq:         permissions
-Provides:       user(%{icinga_user})
 Provides:       group(%{icinga_group})
 Provides:       group(%{icingacmd_group})
+Provides:       user(%{icinga_user})
 Requires(pre):  shadow
 Requires(post): shadow
 # Coreutils is added because of autoyast problems reported
@@ -349,6 +352,10 @@ export CC=gcc-4.8
 export CXX=g++-4.8
 %endif
 
+%if "%{?_buildhost}" != ""
+CMAKE_OPTS="$CMAKE_OPTS -DICINGA2_BUILD_HOST_NAME:STRING=%_buildhost"
+%endif
+
 %{?scl_enable} cmake $CMAKE_OPTS -DCMAKE_C_FLAGS:STRING="%{optflags} %{?march_flag}" -DCMAKE_CXX_FLAGS:STRING="%{optflags} %{?march_flag}" .
 
 make %{?_smp_mflags}
@@ -384,13 +391,8 @@ rm -f %{buildroot}/%{_sysconfdir}/%{name}/features-enabled/*.conf
 %else
   ln -sf ../../%{_initrddir}/%{name} "%{buildroot}%{_sbindir}/rc%{name}"
 %endif
-%if ( 0%{?sle_version} >= 150000 && 0%{?is_opensuse} ) || 0%{?suse_version} > 1500
 mkdir -p "%{buildroot}%{_fillupdir}/"
 mv "%{buildroot}%{_sysconfdir}/sysconfig/%{name}" "%{buildroot}%{_fillupdir}/sysconfig.%{name}"
-%else
-mkdir -p "%{buildroot}%{_localstatedir}/adm/fillup-templates/"
-mv "%{buildroot}%{_sysconfdir}/sysconfig/%{name}" "%{buildroot}%{_localstatedir}/adm/fillup-templates/sysconfig.%{name}"
-%endif
 %endif
 
 %if 0%{?use_selinux}
@@ -422,11 +424,18 @@ install -D -m 0644 tools/syntax/nano/%{name}.nanorc %{buildroot}%{_datadir}/nano
 %if 0%{?use_systemd}
   %service_add_pre %{name}.service
 %endif
+
+%verifyscript
+%verify_permissions -e %{_rundir}/%{name}/cmd
 %endif
 
 %post
 # suse
 %if "%{_vendor}" == "suse"
+%if 0%{?suse_version} >= 1310
+%set_permissions %{_rundir}/%{name}/cmd
+%endif
+
 %if 0%{?use_systemd}
 %fillup_only  %{name}
 %service_add_post %{name}.service
@@ -618,11 +627,7 @@ fi
 %endif
 %if "%{_vendor}" == "suse"
 %{_sbindir}/rc%{name}
-%if ( 0%{?sle_version} >= 150000 && 0%{?is_opensuse} ) || 0%{?suse_version} > 1500
 %{_fillupdir}/sysconfig.%{name}
-%else
-%{_localstatedir}/adm/fillup-templates/sysconfig.%{name}
-%endif
 %else
 %config(noreplace) %{_sysconfdir}/sysconfig/%{name}
 %endif
