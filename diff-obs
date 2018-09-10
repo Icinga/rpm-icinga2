@@ -2,9 +2,11 @@
 
 set -e
 
-project="$1"
-if [ -z "$project" ]; then
-    project=server:monitoring
+srcpkg=icinga2
+project=server:monitoring
+
+if [ -n "$1" ]; then
+  project="$1"
 fi
 
 if ! which osc &>/dev/null; then
@@ -12,6 +14,27 @@ if ! which osc &>/dev/null; then
     exit 1
 fi
 
-osc cat "$project" icinga2 icinga2.spec >icinga2.obs.spec~
+# You can not download this un-authenticated!
+osc cat "$project" "${srcpkg}" "${srcpkg}".spec >"${srcpkg}".obs.spec~
 
-diff -Nau icinga2.spec icinga2.obs.spec~
+# compare without a changelog
+temp_compare="$(mktemp -d)"
+trap 'rm -rf "${temp_compare}"' EXIT SIGINT SIGTERM
+
+for file in "${srcpkg}.obs.spec~" "${srcpkg}.spec"
+do
+  cp ${file} "${temp_compare}/${file}"
+
+  # Start with first line that is not a comment
+  sed -i -n '/^[^#]/,$p' "${temp_compare}/${file}"
+
+  # remove everything after changelog
+  sed -i '/^%changelog/q' "${temp_compare}/${file}"
+done
+
+(
+  cd "${temp_compare}"
+  diff --color=auto -Nu "${srcpkg}.obs.spec~" "${srcpkg}.spec"
+)
+
+# vi: ts=2 sw=2 expandtab
