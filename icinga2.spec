@@ -366,7 +366,7 @@ cd -
 
 %install
 make install \
-	DESTDIR="%{buildroot}"
+  DESTDIR="%{buildroot}"
 
 # install custom limits.conf for systemd
 %if 0%{?configure_systemd_limits}
@@ -436,10 +436,10 @@ install -D -m 0644 tools/syntax/nano/%{name}.nanorc %{buildroot}%{_datadir}/nano
 
 if [ ${1:-0} -eq 1 ]
 then
-	# initial installation, enable default features
-	for feature in checker notification mainlog; do
-		ln -sf ../features-available/${feature}.conf %{_sysconfdir}/%{name}/features-enabled/${feature}.conf
-	done
+  # initial installation, enable default features
+  for feature in checker notification mainlog; do
+    ln -sf ../features-available/${feature}.conf %{_sysconfdir}/%{name}/features-enabled/${feature}.conf
+  done
 fi
 
 exit 0
@@ -455,10 +455,10 @@ exit 0
 
 if [ ${1:-0} -eq 1 ]
 then
-	# initial installation, enable default features
-	for feature in checker notification mainlog; do
-		ln -sf ../features-available/${feature}.conf %{_sysconfdir}/%{name}/features-enabled/${feature}.conf
-	done
+  # initial installation, enable default features
+  for feature in checker notification mainlog; do
+    ln -sf ../features-available/${feature}.conf %{_sysconfdir}/%{name}/features-enabled/${feature}.conf
+  done
 fi
 
 exit 0
@@ -485,8 +485,8 @@ exit 0
 %systemd_preun %{name}.service
 %else
 if [ "$1" = "0" ]; then
-	/sbin/service %{name} stop > /dev/null 2>&1 || :
-	/sbin/chkconfig --del %{name} || :
+  /sbin/service %{name} stop > /dev/null 2>&1 || :
+  /sbin/chkconfig --del %{name} || :
 fi
 %endif
 
@@ -512,7 +512,7 @@ exit 0
 %systemd_postun_with_restart %{name}.service
 %else
 if [ "$1" -ge  "1" ]; then
-	/sbin/service %{name} condrestart >/dev/null 2>&1 || :
+  /sbin/service %{name} condrestart >/dev/null 2>&1 || :
 fi
 %endif
 
@@ -520,8 +520,8 @@ fi
 # suse / rhel
 
 if [ "$1" = "0" ]; then
-	# deinstallation of the package - remove enabled features
-	rm -rf %{_sysconfdir}/%{name}/features-enabled
+  # deinstallation of the package - remove enabled features
+  rm -rf %{_sysconfdir}/%{name}/features-enabled
 fi
 
 exit 0
@@ -546,16 +546,16 @@ getent passwd %{icinga_user} >/dev/null || %{_sbindir}/useradd -c "icinga" -s /s
 %post ido-mysql
 if [ ${1:-0} -eq 1 ] && [ -e %{_sysconfdir}/%{name}/features-enabled/ido-mysql.conf ]
 then
-	# initial installation, enable ido-mysql feature
-	ln -sf ../features-available/ido-mysql.conf %{_sysconfdir}/%{name}/features-enabled/ido-mysql.conf
+  # initial installation, enable ido-mysql feature
+  ln -sf ../features-available/ido-mysql.conf %{_sysconfdir}/%{name}/features-enabled/ido-mysql.conf
 fi
 
 exit 0
 
 %postun ido-mysql
 if [ "$1" = "0" ]; then
-	# deinstallation of the package - remove feature
-	rm -f %{_sysconfdir}/%{name}/features-enabled/ido-mysql.conf
+  # deinstallation of the package - remove feature
+  rm -f %{_sysconfdir}/%{name}/features-enabled/ido-mysql.conf
 fi
 
 exit 0
@@ -563,16 +563,16 @@ exit 0
 %post ido-pgsql
 if [ ${1:-0} -eq 1 ] && [ -e %{_sysconfdir}/%{name}/features-enabled/ido-pgsql.conf ]
 then
-	# initial installation, enable ido-pgsql feature
-	ln -sf ../features-available/ido-pgsql.conf %{_sysconfdir}/%{name}/features-enabled/ido-pgsql.conf
+  # initial installation, enable ido-pgsql feature
+  ln -sf ../features-available/ido-pgsql.conf %{_sysconfdir}/%{name}/features-enabled/ido-pgsql.conf
 fi
 
 exit 0
 
 %postun ido-pgsql
 if [ "$1" = "0" ]; then
-	# deinstallation of the package - remove feature
-	rm -f %{_sysconfdir}/%{name}/features-enabled/ido-pgsql.conf
+  # deinstallation of the package - remove feature
+  rm -f %{_sysconfdir}/%{name}/features-enabled/ido-pgsql.conf
 fi
 
 exit 0
