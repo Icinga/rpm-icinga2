@@ -81,7 +81,11 @@
 %define logmsg logger -t %{name}/rpm
 
 Summary:        Network monitoring application
-License:        GPL-2.0+
+%if "%{_vendor}" == "suse"
+License:        GPL-2.0-or-later
+%else
+License:        GPLv2+
+%endif # suse
 Group:          System/Monitoring
 Name:           icinga2
 Version:        2.10.0
