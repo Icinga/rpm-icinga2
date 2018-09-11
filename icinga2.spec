@@ -672,6 +672,7 @@ fi
 %files bin
 %defattr(-,root,root,-)
 %doc COPYING README.md NEWS AUTHORS CHANGELOG.md
+%dir %{_libdir}/%{name}
 %dir %{_libdir}/%{name}/sbin
 %{_libdir}/%{name}/sbin/%{name}
 %{plugindir}/check_nscp_api
