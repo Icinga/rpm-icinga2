@@ -17,7 +17,7 @@
 # * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.             *
 # ******************************************************************************/
 
-%define revision 0
+%define revision 1
 
 # make sure that _rundir is working on older systems
 %if ! %{defined _rundir}
@@ -731,6 +731,9 @@ fi
 %{_datadir}/nano/%{name}.nanorc
 
 %changelog
+* Thu Oct 11 2018 Michael Friedrich <michael.friedrich@icinga.com> 2.10.0-1
+- Update to 2.10.0
+
 * Wed Sep 26 2018 Michael Friedrich <michael.friedrich@icinga.com> 2.9.2-1
 - Update to 2.9.2
 
