@@ -731,6 +731,9 @@ fi
 %{_datadir}/nano/%{name}.nanorc
 
 %changelog
+* Wed Sep 26 2018 Michael Friedrich <michael.friedrich@icinga.com> 2.9.2-1
+- Update to 2.9.2
+
 * Wed Jul 25 2018 Markus Frosch <markus.frosch@icinga.com> 2.10.0-0
 - Remove obsoleted icinga2-libs package
 
@@ -740,9 +743,14 @@ fi
 * Tue Jul 17 2018 Michael Friedrich <michael.friedrich@icinga.com> 2.9.0-1
 - Update to 2.9.0
 
-* Tue Feb 06 2018 Markus Frosch <markus.frosch@icinga.com> 2.9.0-0
-- Preparing snapshot update to 2.9.0
-- Remove icinga2-studio
+* Wed Apr 25 2018 Jean Flach <jean.flach@icinga.com> 2.8.4-1
+- Update to 2.8.4
+
+* Tue Apr 24 2018 Jean Flach <jean.flach@icinga.com> 2.8.3-1
+- Update to 2.8.3
+
+* Thu Mar 22 2018 Jean Flach <jean-marcel.flach@icinga.com> 2.8.2-1
+- Update to 2.8.2
 
 * Wed Jan 17 2018 Gunnar Beutner <gunnar.beutner@icinga.com> 2.8.1-1
 - Update to 2.8.1
