@@ -597,6 +597,7 @@ do
   /usr/sbin/semodule -s ${selinuxvariant} -i \
     %{_datadir}/selinux/${selinuxvariant}/%{selinux_modulename}.pp &> /dev/null || :
 done
+/sbin/fixfiles -R icinga2 restore &> /dev/null || :
 /sbin/fixfiles -R icinga2-bin restore &> /dev/null || :
 /sbin/fixfiles -R icinga2-common restore &> /dev/null || :
 /sbin/semanage port -a -t icinga2_port_t -p tcp 5665 &> /dev/null || :
@@ -608,6 +609,7 @@ if [ $1 -eq 0 ] ; then
   do
      /usr/sbin/semodule -s ${selinuxvariant} -r %{selinux_modulename} &> /dev/null || :
   done
+  /sbin/fixfiles -R icinga2 restore &> /dev/null || :
   /sbin/fixfiles -R icinga2-bin restore &> /dev/null || :
   /sbin/fixfiles -R icinga2-common restore &> /dev/null || :
 fi
