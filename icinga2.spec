@@ -260,7 +260,7 @@ BuildRequires:  checkpolicy
 BuildRequires:  hardlink
 BuildRequires:  selinux-policy-devel
 Requires:       %{name}-bin = %{version}-%{release}
-%if 0%{?fedora} >= 28 || 0%{?rhel} >= 8
+%if 0%{?fedora} >= 27 || 0%{?rhel} >= 8
 Requires(post):   policycoreutils-python-utils
 Requires(postun): policycoreutils-python-utils
 %else
