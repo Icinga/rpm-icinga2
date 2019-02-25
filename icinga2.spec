@@ -260,8 +260,14 @@ BuildRequires:  checkpolicy
 BuildRequires:  hardlink
 BuildRequires:  selinux-policy-devel
 Requires:       %{name}-bin = %{version}-%{release}
+%if 0%{?fedora} >= 27 || 0%{?rhel} >= 8
+Requires(post):   policycoreutils-python-utils
+Requires(postun): policycoreutils-python-utils
+%else
 Requires(post):   policycoreutils-python
 Requires(postun): policycoreutils-python
+%endif
+
 
 %description selinux
 SELinux policy module supporting icinga2.
