@@ -88,7 +88,7 @@ License:        GPLv2+
 %endif # suse
 Group:          System/Monitoring
 Name:           icinga2
-Version:        2.10.2
+Version: 2.10.3
 Release:        %{revision}%{?dist}
 Url:            https://www.icinga.com/
 Source:         https://github.com/Icinga/%{name}/archive/v%{version}.tar.gz
@@ -739,6 +739,9 @@ fi
 %{_datadir}/nano/%{name}.nanorc
 
 %changelog
+* Tue Feb 25 2019 Michael Friedrich <michael.friedrich@icinga.com> 2.10.3-1
+- Update to 2.10.3
+
 * Wed Nov 14 2018 Michael Friedrich <michael.friedrich@icinga.com> 2.10.2-1
 - Update to 2.10.2
 
