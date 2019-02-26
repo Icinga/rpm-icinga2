@@ -17,7 +17,7 @@
 # * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA.             *
 # ******************************************************************************/
 
-%define revision 1
+%define revision 2
 
 # make sure that _rundir is working on older systems
 %if ! %{defined _rundir}
@@ -300,6 +300,11 @@ Provides Nano syntax highlighting for icinga2.
 # use absolute shebang instead of env on SUSE distributions
 %if "%{_vendor}" == "suse"
 find . -type f -name '*.sh' -exec sed -i -e 's|\/usr\/bin\/env bash|\/bin\/bash|g' {} \;
+%endif
+
+# quick & dirty hack for SLES11 & Kernel < 2.9 w/o SO_REUSEPORT
+%if "%{_vendor}" == "suse" && 0%{?suse_version} < 1210
+find . -type f -name tcpsocket.cpp -exec sed -i -e 's|.*SO_REUSEPORT.*||g' {} \;
 %endif
 
 %build
@@ -739,7 +744,10 @@ fi
 %{_datadir}/nano/%{name}.nanorc
 
 %changelog
-* Tue Feb 25 2019 Michael Friedrich <michael.friedrich@icinga.com> 2.10.3-1
+* Tue Feb 26 2019 Michael Friedrich <michael.friedrich@icinga.com> 2.10.3-2
+- Apply quickfix for SLES11
+
+* Tue Feb 26 2019 Michael Friedrich <michael.friedrich@icinga.com> 2.10.3-1
 - Update to 2.10.3
 
 * Wed Nov 14 2018 Michael Friedrich <michael.friedrich@icinga.com> 2.10.2-1
