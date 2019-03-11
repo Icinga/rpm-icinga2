@@ -1,0 +1,62 @@
+stages:
+  - build
+  - test
+  - upload
+
+variables:
+  DOCKER_IMAGE_BASE: registry.icinga.com/build-docker
+  ICINGA_BUILD_TYPE: snapshot
+
+.build: &build
+  stage: build
+  tags:
+    - docker
+  image: ${DOCKER_IMAGE_BASE}/${DOCKER_IMAGE}
+  script:
+    - icinga-build-package
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - ccache/
+  artifacts:
+    paths:
+      - build/*
+    expire_in: 1 week
+
+.test: &test
+  stage: test
+  tags:
+    - docker
+  image: ${DOCKER_IMAGE_BASE}/${DOCKER_IMAGE}
+  script:
+    - find build/
+    - icinga-build-test
+
+.upload: &upload
+  stage: upload
+  tags:
+    - docker
+  image: ${DOCKER_IMAGE_BASE}/upload
+  script:
+    - find build/
+    - icinga-build-upload-aptly
+  only:
+    - tags
+    - master
+
+build/centos/7:
+  <<: *build
+  variables:
+    DOCKER_IMAGE: centos/7
+
+test/centos/7:
+  <<: *test
+  variables:
+    DOCKER_IMAGE: centos/7
+  dependencies:
+    - build/centos/7
+
+upload/epel/7:
+  <<: *upload
+  dependencies:
+    - build/centos/7
