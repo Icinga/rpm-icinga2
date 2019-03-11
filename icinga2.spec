@@ -36,7 +36,7 @@
 %define apacheuser apache
 %define apachegroup apache
 
-%if 0%{?el5}%{?el6}%{?amzn}
+%if 0%{?el6}%{?amzn}
 %define use_systemd 0
 %define use_selinux 0
 %if %(uname -m) != "x86_64"
@@ -122,7 +122,7 @@ BuildRequires:  gcc48-c++
 BuildRequires:  libopenssl1-devel
 BuildRequires:  libstdc++48-devel
 %else
-%if "%{_vendor}" == "redhat" && (0%{?el5} || 0%{?rhel} == 5 || "%{?dist}" == ".el5" || 0%{?el6} || 0%{?rhel} == 6 || "%{?dist}" == ".el6")
+%if "%{_vendor}" == "redhat" && (0%{?el6} || 0%{?rhel} == 6 || "%{?dist}" == ".el6")
 # Requires devtoolset-2 scl
 BuildRequires:  devtoolset-2-binutils
 BuildRequires:  devtoolset-2-gcc-c++
@@ -139,8 +139,8 @@ BuildRequires:  cmake
 BuildRequires:  flex >= 2.5.35
 BuildRequires:  make
 
-%if 0%{?build_icinga_org} && "%{_vendor}" == "redhat" && (0%{?el5} || 0%{?rhel} == 5 || "%{?dist}" == ".el5" || 0%{?el6} || 0%{?rhel} == 6 || "%{?dist}" == ".el6")
-# el5 and el6 require packages.icinga.com
+%if 0%{?build_icinga_org} && "%{_vendor}" == "redhat" && (0%{?el6} || 0%{?rhel} == 6 || "%{?dist}" == ".el6")
+# el6 require packages.icinga.com
 BuildRequires:  boost153-devel
 %else
 %if 0%{?build_icinga_org} && "%{_vendor}" == "suse" && 0%{?suse_version} < 1310
@@ -153,7 +153,7 @@ BuildRequires:  libboost_regex-devel >= 1.48
 BuildRequires:  libboost_system-devel >= 1.48
 BuildRequires:  libboost_thread-devel >= 1.48
 %else
-%if (0%{?el5} || 0%{?rhel} == 5 || "%{?dist}" == ".el5" || 0%{?el6} || 0%{?rhel} == 6 || "%{?dist}" == ".el6")
+%if (0%{?el6} || 0%{?rhel} == 6 || "%{?dist}" == ".el6")
 # Requires EPEL repository
 BuildRequires:  boost148-devel >= 1.48
 %else
@@ -324,7 +324,7 @@ CMAKE_OPTS="-DCMAKE_INSTALL_PREFIX=/usr \
 CMAKE_OPTS="$CMAKE_OPTS -DICINGA2_WITH_STUDIO=true"
 %endif
 %if "%{_vendor}" == "redhat"
-%if 0%{?el5} || 0%{?rhel} == 5 || "%{?dist}" == ".el5" || 0%{?el6} || 0%{?rhel} == 6 || "%{?dist}" == ".el6"
+%if 0%{?el6} || 0%{?rhel} == 6 || "%{?dist}" == ".el6"
 %if 0%{?build_icinga_org}
 # Boost_VERSION 1.41.0 vs 101400 - disable build tests
 # details in https://dev.icinga.com/issues/5033
