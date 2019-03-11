@@ -6,6 +6,7 @@ stages:
 variables:
   DOCKER_IMAGE_BASE: registry.icinga.com/build-docker
   ICINGA_BUILD_TYPE: snapshot
+  ICINGA_BUILD_UPSTREAM_BRANCH: feature/boost-asio
 
 .build: &build
   stage: build
