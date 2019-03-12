@@ -143,25 +143,33 @@ BuildRequires:  flex >= 2.5.35
 BuildRequires:  make
 
 %if "%{_vendor}" == "suse"
-%if 0%{?suse_version} > 1320 # SLES 15 and OpenSUSE
+  %if 0%{?suse_version} > 1320 # SLES 15 and OpenSUSE
+    # TODO: multiple packages
+    %define boost_devel_pkg %nil
 BuildRequires:  libboost_program_options-devel >= %{boost_min_version}
 BuildRequires:  libboost_regex-devel >= %{boost_min_version}
 BuildRequires:  libboost_system-devel >= %{boost_min_version}
 BuildRequires:  libboost_thread-devel >= %{boost_min_version}
-%else #suse_version > 1320
-BuildRequires:  boost-devel >= %{boost_min_version}
-%endif #suse_version > 1320
+  %endif #suse_version > 1320
 %else # vendor == suse - assuming redhat or compatible
-%if (0%{?el6} || 0%{?rhel} == 6) || (0%{?el7} || 0%{?rhel} == 7)
-%define boost_library boost169
-%define boost_version 1.69
-# el6: Provided by packages.icinga.com
-# el7: Provided from EPEL
-BuildRequires:  boost169-devel >= %{boost_min_version}
-%else # el6 or el7
-BuildRequires:  boost-devel >= %{boost_min_version}
-%endif # el6 or el7
+  %if (0%{?el6} || 0%{?rhel} == 6)
+    # Provided by packages.icinga.com
+    %define boost_library icinga-boost169
+    %define boost_version 1.69
+    %define boost_devel_pkg icinga-boost169-devel
+    %define boost_rpath %{_libdir}/%{boost_library}
+  %endif # el6
+  %if (0%{?el7} || 0%{?rhel} == 7)
+    # Provided by EPEL
+    %define boost_library boost169
+    %define boost_version 1.69
+    %define boost_devel_pkg boost169-devel
+  %endif # el7
 %endif # vendor == suse
+
+%if "%{?boost_devel_pkg}" != "%nil"
+BuildRequires: %{?boost_devel_pkg}%{!?boost_devel_pkg:boost-devel} >= %{boost_min_version}
+%endif # boost_devel_pkg
 
 %if 0%{?use_systemd}
 BuildRequires:  systemd-devel
@@ -328,6 +336,10 @@ CMAKE_OPTS="$CMAKE_OPTS -DICINGA2_WITH_STUDIO=true"
 # Explicitly link against rt, because ld doesn't detect it automatically
 CMAKE_OPTS="$CMAKE_OPTS -DCMAKE_EXE_LINKER_FLAGS=-lrt"
 %endif # el6
+
+%if "%{?boost_rpath}" != ""
+CMAKE_OPTS="$CMAKE_OPTS -DCMAKE_INSTALL_RPATH=%{boost_rpath}"
+%endif # boost_rpath
 
 %if "%{?boost_library}" != ""
 # Boost_NO_BOOST_CMAKE=ON  - disable search for cmake
