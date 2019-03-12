@@ -323,6 +323,11 @@ CMAKE_OPTS="-DCMAKE_INSTALL_PREFIX=/usr \
 CMAKE_OPTS="$CMAKE_OPTS -DICINGA2_WITH_STUDIO=true"
 %endif
 
+%if (0%{?el6} || 0%{?rhel} == 6)
+# Explicitly link against rt, because ld doesn't detect it automatically
+CMAKE_OPTS="$CMAKE_OPTS -DCMAKE_EXE_LINKER_FLAGS=-lrt"
+%endif # el6
+
 %if "%{?boost_library}" != ""
 # Boost_NO_BOOST_CMAKE=ON  - disable search for cmake
 # Boost_NO_SYSTEM_PATHS=ON - only search in specified locations
