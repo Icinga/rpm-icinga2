@@ -61,3 +61,20 @@ upload/epel/7:
   <<: *upload
   dependencies:
     - build/centos/7
+
+build/centos/6:
+  <<: *build
+  variables:
+    DOCKER_IMAGE: centos/6
+
+test/centos/6:
+  <<: *test
+  variables:
+    DOCKER_IMAGE: centos/6
+  dependencies:
+    - build/centos/6
+
+upload/epel/6:
+  <<: *upload
+  dependencies:
+    - build/centos/6
