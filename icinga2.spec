@@ -125,11 +125,12 @@ BuildRequires:  libopenssl1-devel
 BuildRequires:  libstdc++48-devel
 %else
 %if "%{_vendor}" == "redhat" && (0%{?el6} || 0%{?rhel} == 6 || "%{?dist}" == ".el6")
-# Requires devtoolset-2 scl
-BuildRequires:  devtoolset-2-binutils
-BuildRequires:  devtoolset-2-gcc-c++
-BuildRequires:  devtoolset-2-libstdc++-devel
-%define scl_enable scl enable devtoolset-2 --
+# Requires devtoolset-7 scl
+%define scl_name devtoolset-7
+%define scl_enable scl enable %{scl_name} --
+BuildRequires:  %{scl_name}-binutils
+BuildRequires:  %{scl_name}-gcc-c++
+BuildRequires:  %{scl_name}-libstdc++-devel
 %else
 BuildRequires:  gcc-c++
 BuildRequires:  libstdc++-devel
