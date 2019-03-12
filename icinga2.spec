@@ -352,7 +352,7 @@ CMAKE_OPTS="$CMAKE_OPTS -DICINGA2_BUILD_HOST_NAME:STRING=%_buildhost"
 
 %{?scl_enable} cmake $CMAKE_OPTS -DCMAKE_C_FLAGS:STRING="%{optflags} %{?march_flag}" -DCMAKE_CXX_FLAGS:STRING="%{optflags} %{?march_flag}" .
 
-make %{?_smp_mflags}
+%{?scl_enable} make %{?_smp_mflags}
 
 %if 0%{?use_selinux}
 cd tools/selinux
@@ -366,7 +366,7 @@ cd -
 %endif
 
 %install
-make install \
+%{?scl_enable} make install \
   DESTDIR="%{buildroot}"
 
 # install custom limits.conf for systemd
