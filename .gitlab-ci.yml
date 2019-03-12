@@ -19,6 +19,7 @@ variables:
     key: "${CI_JOB_NAME}"
     paths:
       - ccache/
+      - '*.git'
   artifacts:
     paths:
       - build/*
