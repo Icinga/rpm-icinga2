@@ -368,8 +368,6 @@ CMAKE_OPTS="$CMAKE_OPTS
  -DBOOST_LIBRARYDIR=%{_libdir}/%{boost_library} \
  -DBOOST_INCLUDEDIR=/usr/include/%{boost_library} \
  -DBoost_ADDITIONAL_VERSIONS='%{boost_version};%{boost_version}.0'"
-# TODO: does testing work now?
-# -DBUILD_TESTING=FALSE"
 %endif # boost_library
 
 %if 0%{?use_systemd}
@@ -448,6 +446,10 @@ install -D -m 0644 tools/syntax/vim/ftdetect/%{name}.vim %{buildroot}%{_datadir}
 %endif
 
 install -D -m 0644 tools/syntax/nano/%{name}.nanorc %{buildroot}%{_datadir}/nano/%{name}.nanorc
+
+%check
+export CTEST_OUTPUT_ON_FAILURE=1
+make test
 
 %pre
 %if "%{_vendor}" == "suse"
