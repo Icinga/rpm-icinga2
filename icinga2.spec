@@ -148,6 +148,8 @@ BuildRequires:  make
     %define boost_devel_pkg %nil
     # Using the split
     # Provided by packages.icinga.com or OS, when boost is newer than %%{boost_min_version}
+BuildRequires:  libboost_context-devel-impl >= %{boost_min_version}
+BuildRequires:  libboost_coroutine-devel-impl >= %{boost_min_version}
 BuildRequires:  libboost_program_options-devel-impl >= %{boost_min_version}
 BuildRequires:  libboost_regex-devel-impl >= %{boost_min_version}
 BuildRequires:  libboost_system-devel-impl >= %{boost_min_version}
