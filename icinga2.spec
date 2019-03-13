@@ -143,15 +143,31 @@ BuildRequires:  flex >= 2.5.35
 BuildRequires:  make
 
 %if "%{_vendor}" == "suse"
-  %if 0%{?suse_version} > 1320 # SLES 15 and OpenSUSE
-    # TODO: multiple packages
+  %if 0%{?suse_version} >= 1315
+    # SLES 12 and OpenSUSE 42 or later
     %define boost_devel_pkg %nil
-BuildRequires:  libboost_program_options-devel >= %{boost_min_version}
-BuildRequires:  libboost_regex-devel >= %{boost_min_version}
-BuildRequires:  libboost_system-devel >= %{boost_min_version}
-BuildRequires:  libboost_thread-devel >= %{boost_min_version}
-  %endif #suse_version > 1320
+    # Using the split
+    # Provided by packages.icinga.com or OS, when boost is newer than %%{boost_min_version}
+BuildRequires:  libboost_program_options-devel-impl >= %{boost_min_version}
+BuildRequires:  libboost_regex-devel-impl >= %{boost_min_version}
+BuildRequires:  libboost_system-devel-impl >= %{boost_min_version}
+BuildRequires:  libboost_thread-devel-impl >= %{boost_min_version}
+BuildRequires:  libboost_test-devel-impl >= %{boost_min_version}
+    %if 0%{?suse_version} < 1320
+      # before SLES 15 and OpenSUSE 15
+      # Provided by packages.icinga.com
+      %define boost_library icinga-boost
+      %define boost_version 1.69
+      %define boost_rpath %{_libdir}/%{boost_library}
+    %endif # suse_version < 1320
+  %else # suse_version >= 1315
+    # old boost devel name
+    %define boost_devel_pkg boost-devel
+  %endif # suse_version >= 1315
 %else # vendor == suse - assuming redhat or compatible
+  # default boost devel package
+  %define boost_devel_pkg boost-devel
+
   %if (0%{?el6} || 0%{?rhel} == 6)
     # Provided by packages.icinga.com
     %define boost_library icinga-boost169
@@ -167,8 +183,8 @@ BuildRequires:  libboost_thread-devel >= %{boost_min_version}
   %endif # el7
 %endif # vendor == suse
 
-%if "%{?boost_devel_pkg}" != "%nil"
-BuildRequires: %{?boost_devel_pkg}%{!?boost_devel_pkg:boost-devel} >= %{boost_min_version}
+%if "%{?boost_devel_pkg}" != ""
+BuildRequires: %{boost_devel_pkg} >= %{boost_min_version}
 %endif # boost_devel_pkg
 
 %if 0%{?use_systemd}
