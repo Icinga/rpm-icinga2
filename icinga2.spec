@@ -146,22 +146,22 @@ BuildRequires:  make
   %if 0%{?suse_version} >= 1315
     # SLES 12 and OpenSUSE 42 or later
     %define boost_devel_pkg %nil
-    # Using the split
-    # Provided by packages.icinga.com or OS, when boost is newer than %%{boost_min_version}
-BuildRequires:  libboost_context-devel-impl >= %{boost_min_version}
-BuildRequires:  libboost_coroutine-devel-impl >= %{boost_min_version}
-BuildRequires:  libboost_program_options-devel-impl >= %{boost_min_version}
-BuildRequires:  libboost_regex-devel-impl >= %{boost_min_version}
-BuildRequires:  libboost_system-devel-impl >= %{boost_min_version}
-BuildRequires:  libboost_thread-devel-impl >= %{boost_min_version}
-BuildRequires:  libboost_test-devel-impl >= %{boost_min_version}
     %if 0%{?suse_version} < 1320
       # before SLES 15 and OpenSUSE 15
       # Provided by packages.icinga.com
       %define boost_library icinga-boost
       %define boost_version 1.69
       %define boost_rpath %{_libdir}/%{boost_library}
+      # Note: the -impl suffix comes from current packages on OBS
+      %define boost_devel_suffix -impl
     %endif # suse_version < 1320
+BuildRequires:  libboost_context-devel%{?boost_devel_suffix} >= %{boost_min_version}
+BuildRequires:  libboost_coroutine-devel%{?boost_devel_suffix} >= %{boost_min_version}
+BuildRequires:  libboost_program_options-devel%{?boost_devel_suffix} >= %{boost_min_version}
+BuildRequires:  libboost_regex-devel%{?boost_devel_suffix} >= %{boost_min_version}
+BuildRequires:  libboost_system-devel%{?boost_devel_suffix} >= %{boost_min_version}
+BuildRequires:  libboost_thread-devel%{?boost_devel_suffix} >= %{boost_min_version}
+BuildRequires:  libboost_test-devel%{?boost_devel_suffix} >= %{boost_min_version}
   %else # suse_version >= 1315
     # old boost devel name
     %define boost_devel_pkg boost-devel
