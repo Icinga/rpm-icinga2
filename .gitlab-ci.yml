@@ -84,6 +84,43 @@ upload/epel/6:
     - build/centos/6
 
 ###################################
+# Fedora
+###################################
+build/fedora/29:
+  <<: *build
+  variables:
+    DOCKER_IMAGE: fedora/29
+
+test/fedora/29:
+  <<: *test
+  variables:
+    DOCKER_IMAGE: fedora/29
+  dependencies:
+    - build/fedora/29
+
+upload/fedora/29:
+  <<: *upload
+  dependencies:
+    - build/fedora/29
+
+build/fedora/28:
+  <<: *build
+  variables:
+    DOCKER_IMAGE: fedora/28
+
+test/fedora/28:
+  <<: *test
+  variables:
+    DOCKER_IMAGE: fedora/28
+  dependencies:
+    - build/fedora/28
+
+upload/fedora/28:
+  <<: *upload
+  dependencies:
+    - build/fedora/28
+
+###################################
 # SLES
 ###################################
 build/sles/15.0:
