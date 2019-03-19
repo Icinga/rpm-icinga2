@@ -1,6 +1,6 @@
 # Icinga 2 | (c) 2012 Icinga GmbH | GPLv2+
 
-%define revision 2
+%define revision 1
 
 # make sure that _rundir is working on older systems
 %if ! %{defined _rundir}
@@ -71,7 +71,7 @@ License:        GPLv2+
 %endif # suse
 Group:          System/Monitoring
 Name:           icinga2
-Version: 2.10.3
+Version: 2.10.4
 Release:        %{revision}%{?dist}
 Url:            https://www.icinga.com/
 Source:         https://github.com/Icinga/%{name}/archive/v%{version}.tar.gz
@@ -727,6 +727,9 @@ fi
 %{_datadir}/nano/%{name}.nanorc
 
 %changelog
+* Tue Mar 19 2019 Michael Friedrich <michael.friedrich@icinga.com> 2.10.4-1
+- Update to 2.10.4
+
 * Tue Feb 26 2019 Michael Friedrich <michael.friedrich@icinga.com> 2.10.3-2
 - Apply quickfix for SLES11
 
