@@ -6,7 +6,7 @@ stages:
 variables:
   DOCKER_IMAGE_BASE: registry.icinga.com/build-docker
   ICINGA_BUILD_TYPE: snapshot
-  ICINGA_BUILD_UPSTREAM_BRANCH: feature/boost-asio
+  #ICINGA_BUILD_UPSTREAM_BRANCH:
 
 .build: &build
   stage: build
@@ -42,9 +42,10 @@ variables:
   script:
     - find build/
     - icinga-build-upload-aptly
-  only:
-    - tags
-    - master
+  # TODO: enable when switching to GitLab CI
+  #only:
+  #  - tags
+  #  - master
 
 ###################################
 # EPEL
