@@ -1,0 +1,212 @@
+stages:
+  - build
+  - test
+  - upload
+
+variables:
+  DOCKER_IMAGE_BASE: registry.icinga.com/build-docker
+  ICINGA_BUILD_TYPE: snapshot
+  ICINGA_BUILD_UPSTREAM_BRANCH: feature/boost-asio
+
+.build: &build
+  stage: build
+  tags:
+    - docker
+  image: ${DOCKER_IMAGE_BASE}/${DOCKER_IMAGE}
+  script:
+    - icinga-build-package
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - ccache/
+      - 'icinga2.git'
+  artifacts:
+    paths:
+      - build/*
+    expire_in: 1 week
+
+.test: &test
+  stage: test
+  tags:
+    - docker
+  image: ${DOCKER_IMAGE_BASE}/${DOCKER_IMAGE}
+  script:
+    - find build/
+    - icinga-build-test
+
+.upload: &upload
+  stage: upload
+  tags:
+    - docker
+  image: ${DOCKER_IMAGE_BASE}/upload
+  script:
+    - find build/
+    - icinga-build-upload-aptly
+  only:
+    - tags
+    - master
+
+###################################
+# EPEL
+###################################
+build/centos/7:
+  <<: *build
+  variables:
+    DOCKER_IMAGE: centos/7
+
+test/centos/7:
+  <<: *test
+  variables:
+    DOCKER_IMAGE: centos/7
+  dependencies:
+    - build/centos/7
+
+upload/epel/7:
+  <<: *upload
+  dependencies:
+    - build/centos/7
+
+build/centos/6:
+  <<: *build
+  variables:
+    DOCKER_IMAGE: centos/6
+
+test/centos/6:
+  <<: *test
+  variables:
+    DOCKER_IMAGE: centos/6
+  dependencies:
+    - build/centos/6
+
+upload/epel/6:
+  <<: *upload
+  dependencies:
+    - build/centos/6
+
+###################################
+# Fedora
+###################################
+build/fedora/29:
+  <<: *build
+  variables:
+    DOCKER_IMAGE: fedora/29
+
+test/fedora/29:
+  <<: *test
+  variables:
+    DOCKER_IMAGE: fedora/29
+  dependencies:
+    - build/fedora/29
+
+upload/fedora/29:
+  <<: *upload
+  dependencies:
+    - build/fedora/29
+
+build/fedora/28:
+  <<: *build
+  variables:
+    DOCKER_IMAGE: fedora/28
+
+test/fedora/28:
+  <<: *test
+  variables:
+    DOCKER_IMAGE: fedora/28
+  dependencies:
+    - build/fedora/28
+
+upload/fedora/28:
+  <<: *upload
+  dependencies:
+    - build/fedora/28
+
+###################################
+# SLES
+###################################
+build/sles/15.0:
+  <<: *build
+  variables:
+    DOCKER_IMAGE: sles/15.0
+
+test/sles/15.0:
+  <<: *test
+  variables:
+    DOCKER_IMAGE: sles/15.0
+  dependencies:
+    - build/sles/15.0
+
+upload/SUSE/15.0:
+  <<: *upload
+  dependencies:
+    - build/sles/15.0
+
+build/sles/12.4:
+  <<: *build
+  variables:
+    DOCKER_IMAGE: sles/12.4
+
+test/sles/12.4:
+  <<: *test
+  variables:
+    DOCKER_IMAGE: sles/12.4
+  dependencies:
+    - build/sles/12.4
+
+upload/SUSE/12.4:
+  <<: *upload
+  dependencies:
+    - build/sles/12.4
+
+build/sles/12.3:
+  <<: *build
+  variables:
+    DOCKER_IMAGE: sles/12.3
+
+test/sles/12.3:
+  <<: *test
+  variables:
+    DOCKER_IMAGE: sles/12.3
+  dependencies:
+    - build/sles/12.3
+
+upload/SUSE/12.3:
+  <<: *upload
+  dependencies:
+    - build/sles/12.3
+
+###################################
+# openSUSE
+###################################
+build/opensuse/15.0:
+  <<: *build
+  variables:
+    DOCKER_IMAGE: opensuse/15.0
+
+test/opensuse/15.0:
+  <<: *test
+  variables:
+    DOCKER_IMAGE: opensuse/15.0
+  dependencies:
+    - build/opensuse/15.0
+
+upload/openSUSE/15.0:
+  <<: *upload
+  dependencies:
+    - build/opensuse/15.0
+
+build/opensuse/42.3:
+  <<: *build
+  variables:
+    DOCKER_IMAGE: opensuse/42.3
+
+test/opensuse/42.3:
+  <<: *test
+  variables:
+    DOCKER_IMAGE: opensuse/42.3
+  dependencies:
+    - build/opensuse/42.3
+
+upload/openSUSE/42.3:
+  <<: *upload
+  dependencies:
+    - build/opensuse/42.3

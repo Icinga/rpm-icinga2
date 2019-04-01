@@ -19,7 +19,7 @@
 %define apacheuser apache
 %define apachegroup apache
 
-%if 0%{?el5}%{?el6}%{?amzn}
+%if 0%{?el6}%{?amzn}
 %define use_systemd 0
 %define use_selinux 0
 %if %(uname -m) != "x86_64"
@@ -63,6 +63,8 @@
 
 %define logmsg logger -t %{name}/rpm
 
+%define boost_min_version 1.66
+
 Summary:        Network monitoring application
 %if "%{_vendor}" == "suse"
 License:        GPL-2.0-or-later
@@ -105,12 +107,13 @@ BuildRequires:  gcc48-c++
 BuildRequires:  libopenssl1-devel
 BuildRequires:  libstdc++48-devel
 %else
-%if "%{_vendor}" == "redhat" && (0%{?el5} || 0%{?rhel} == 5 || "%{?dist}" == ".el5" || 0%{?el6} || 0%{?rhel} == 6 || "%{?dist}" == ".el6")
-# Requires devtoolset-2 scl
-BuildRequires:  devtoolset-2-binutils
-BuildRequires:  devtoolset-2-gcc-c++
-BuildRequires:  devtoolset-2-libstdc++-devel
-%define scl_enable scl enable devtoolset-2 --
+%if "%{_vendor}" == "redhat" && (0%{?el6} || 0%{?rhel} == 6 || "%{?dist}" == ".el6")
+# Requires devtoolset-7 scl
+%define scl_name devtoolset-7
+%define scl_enable scl enable %{scl_name} --
+BuildRequires:  %{scl_name}-binutils
+BuildRequires:  %{scl_name}-gcc-c++
+BuildRequires:  %{scl_name}-libstdc++-devel
 %else
 BuildRequires:  gcc-c++
 BuildRequires:  libstdc++-devel
@@ -122,29 +125,52 @@ BuildRequires:  cmake
 BuildRequires:  flex >= 2.5.35
 BuildRequires:  make
 
-%if 0%{?build_icinga_org} && "%{_vendor}" == "redhat" && (0%{?el5} || 0%{?rhel} == 5 || "%{?dist}" == ".el5" || 0%{?el6} || 0%{?rhel} == 6 || "%{?dist}" == ".el6")
-# el5 and el6 require packages.icinga.com
-BuildRequires:  boost153-devel
-%else
-%if 0%{?build_icinga_org} && "%{_vendor}" == "suse" && 0%{?suse_version} < 1310
-# sles 11 sp3 requires packages.icinga.com
-BuildRequires:  boost153-devel
-%else
-%if "%{_vendor}" == "suse" && 0%{?suse_version} > 1320
-BuildRequires:  libboost_program_options-devel >= 1.48
-BuildRequires:  libboost_regex-devel >= 1.48
-BuildRequires:  libboost_system-devel >= 1.48
-BuildRequires:  libboost_thread-devel >= 1.48
-%else
-%if (0%{?el5} || 0%{?rhel} == 5 || "%{?dist}" == ".el5" || 0%{?el6} || 0%{?rhel} == 6 || "%{?dist}" == ".el6")
-# Requires EPEL repository
-BuildRequires:  boost148-devel >= 1.48
-%else
-BuildRequires:  boost-devel >= 1.48
-%endif
-%endif
-%endif
-%endif
+%if "%{_vendor}" == "suse"
+  %if 0%{?suse_version} >= 1315
+    # SLES 12 and OpenSUSE 42 or later
+    %define boost_devel_pkg %nil
+    %if 0%{?suse_version} < 1320
+      # before SLES 15 and OpenSUSE 15
+      # Provided by packages.icinga.com
+      %define boost_library icinga-boost
+      %define boost_version 1.69
+      %define boost_rpath %{_libdir}/%{boost_library}
+      # Note: the -impl suffix comes from current packages on OBS
+      %define boost_devel_suffix -impl
+    %endif # suse_version < 1320
+BuildRequires:  libboost_context-devel%{?boost_devel_suffix} >= %{boost_min_version}
+BuildRequires:  libboost_coroutine-devel%{?boost_devel_suffix} >= %{boost_min_version}
+BuildRequires:  libboost_program_options-devel%{?boost_devel_suffix} >= %{boost_min_version}
+BuildRequires:  libboost_regex-devel%{?boost_devel_suffix} >= %{boost_min_version}
+BuildRequires:  libboost_system-devel%{?boost_devel_suffix} >= %{boost_min_version}
+BuildRequires:  libboost_thread-devel%{?boost_devel_suffix} >= %{boost_min_version}
+BuildRequires:  libboost_test-devel%{?boost_devel_suffix} >= %{boost_min_version}
+  %else # suse_version >= 1315
+    # old boost devel name
+    %define boost_devel_pkg boost-devel
+  %endif # suse_version >= 1315
+%else # vendor == suse - assuming redhat or compatible
+  # default boost devel package
+  %define boost_devel_pkg boost-devel
+
+  %if (0%{?el6} || 0%{?rhel} == 6)
+    # Provided by packages.icinga.com
+    %define boost_library icinga-boost169
+    %define boost_version 1.69
+    %define boost_devel_pkg icinga-boost169-devel
+    %define boost_rpath %{_libdir}/%{boost_library}
+  %endif # el6
+  %if (0%{?el7} || 0%{?rhel} == 7)
+    # Provided by EPEL
+    %define boost_library boost169
+    %define boost_version 1.69
+    %define boost_devel_pkg boost169-devel
+  %endif # el7
+%endif # vendor == suse
+
+%if "%{?boost_devel_pkg}" != ""
+BuildRequires: %{boost_devel_pkg} >= %{boost_min_version}
+%endif # boost_devel_pkg
 
 %if 0%{?use_systemd}
 BuildRequires:  systemd-devel
@@ -311,34 +337,26 @@ CMAKE_OPTS="-DCMAKE_INSTALL_PREFIX=/usr \
 %if 0%{?fedora}
 CMAKE_OPTS="$CMAKE_OPTS -DICINGA2_WITH_STUDIO=true"
 %endif
-%if "%{_vendor}" == "redhat"
-%if 0%{?el5} || 0%{?rhel} == 5 || "%{?dist}" == ".el5" || 0%{?el6} || 0%{?rhel} == 6 || "%{?dist}" == ".el6"
-%if 0%{?build_icinga_org}
-# Boost_VERSION 1.41.0 vs 101400 - disable build tests
-# details in https://dev.icinga.com/issues/5033
-CMAKE_OPTS="$CMAKE_OPTS -DBOOST_LIBRARYDIR=%{_libdir}/boost153 \
- -DBOOST_INCLUDEDIR=/usr/include/boost153 \
- -DBoost_ADDITIONAL_VERSIONS='1.53;1.53.0'"
-%else
-CMAKE_OPTS="$CMAKE_OPTS -DBOOST_LIBRARYDIR=%{_libdir}/boost148 \
- -DBOOST_INCLUDEDIR=/usr/include/boost148 \
- -DBoost_ADDITIONAL_VERSIONS='1.48;1.48.0'"
-%endif
-CMAKE_OPTS="$CMAKE_OPTS \
- -DBoost_NO_SYSTEM_PATHS=TRUE \
- -DBUILD_TESTING=FALSE \
- -DBoost_NO_BOOST_CMAKE=TRUE"
-%endif
-%endif
 
-%if "%{_vendor}" == "suse" && 0%{?suse_version} < 1310
-CMAKE_OPTS="$CMAKE_OPTS -DBOOST_LIBRARYDIR=%{_libdir}/boost153 \
- -DBOOST_INCLUDEDIR=/usr/include/boost153 \
- -DBoost_ADDITIONAL_VERSIONS='1.53;1.53.0' \
+%if (0%{?el6} || 0%{?rhel} == 6)
+# Explicitly link against rt, because ld doesn't detect it automatically
+CMAKE_OPTS="$CMAKE_OPTS -DCMAKE_EXE_LINKER_FLAGS=-lrt"
+%endif # el6
+
+%if "%{?boost_rpath}" != ""
+CMAKE_OPTS="$CMAKE_OPTS -DCMAKE_INSTALL_RPATH=%{boost_rpath}"
+%endif # boost_rpath
+
+%if "%{?boost_library}" != ""
+# Boost_NO_BOOST_CMAKE=ON  - disable search for cmake
+# Boost_NO_SYSTEM_PATHS=ON - only search in specified locations
+CMAKE_OPTS="$CMAKE_OPTS
+ -DBoost_NO_BOOST_CMAKE=TRUE \
  -DBoost_NO_SYSTEM_PATHS=TRUE \
- -DBUILD_TESTING=FALSE \
- -DBoost_NO_BOOST_CMAKE=TRUE"
-%endif
+ -DBOOST_LIBRARYDIR=%{_libdir}/%{boost_library} \
+ -DBOOST_INCLUDEDIR=/usr/include/%{boost_library} \
+ -DBoost_ADDITIONAL_VERSIONS='%{boost_version};%{boost_version}.0'"
+%endif # boost_library
 
 %if 0%{?use_systemd}
 CMAKE_OPTS="$CMAKE_OPTS -DUSE_SYSTEMD=ON"
@@ -356,7 +374,7 @@ CMAKE_OPTS="$CMAKE_OPTS -DICINGA2_BUILD_HOST_NAME:STRING=%_buildhost"
 
 %{?scl_enable} cmake $CMAKE_OPTS -DCMAKE_C_FLAGS:STRING="%{optflags} %{?march_flag}" -DCMAKE_CXX_FLAGS:STRING="%{optflags} %{?march_flag}" .
 
-make %{?_smp_mflags}
+%{?scl_enable} make %{?_smp_mflags}
 
 %if 0%{?use_selinux}
 cd tools/selinux
@@ -370,7 +388,7 @@ cd -
 %endif
 
 %install
-make install \
+%{?scl_enable} make install \
   DESTDIR="%{buildroot}"
 
 # install custom limits.conf for systemd
@@ -416,6 +434,10 @@ install -D -m 0644 tools/syntax/vim/ftdetect/%{name}.vim %{buildroot}%{_datadir}
 %endif
 
 install -D -m 0644 tools/syntax/nano/%{name}.nanorc %{buildroot}%{_datadir}/nano/%{name}.nanorc
+
+%check
+export CTEST_OUTPUT_ON_FAILURE=1
+make test
 
 %pre
 %if "%{_vendor}" == "suse"
