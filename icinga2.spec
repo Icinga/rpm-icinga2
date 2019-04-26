@@ -140,6 +140,7 @@ BuildRequires:  make
     %endif # suse_version < 1320
 BuildRequires:  libboost_context-devel%{?boost_devel_suffix} >= %{boost_min_version}
 BuildRequires:  libboost_coroutine-devel%{?boost_devel_suffix} >= %{boost_min_version}
+BuildRequires:  libboost_filesystem-devel%{?boost_devel_suffix} >= %{boost_min_version}
 BuildRequires:  libboost_program_options-devel%{?boost_devel_suffix} >= %{boost_min_version}
 BuildRequires:  libboost_regex-devel%{?boost_devel_suffix} >= %{boost_min_version}
 BuildRequires:  libboost_system-devel%{?boost_devel_suffix} >= %{boost_min_version}
