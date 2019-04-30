@@ -70,10 +70,7 @@
 
 %bcond_without lto_build
 %bcond_with systemd_and_init
-%bcond_without checker
 %bcond_without compat
-%bcond_with demo
-%bcond_with hello
 %bcond_without livestatus
 %bcond_without notification
 %bcond_without perfdata
@@ -245,6 +242,7 @@ Group:          Documentation/Other
 This subpackage provides documentation for Icinga 2.
 
 
+%if %{with mysql}
 %package ido-mysql
 Summary:        IDO MySQL database backend for Icinga 2
 Group:          System/Monitoring
@@ -263,8 +261,10 @@ Requires:       %{name}-bin = %{version}-%{release}
 %description ido-mysql
 Icinga 2 IDO mysql database backend. Compatible with Icinga 1.x
 IDOUtils schema >= 1.12
+%endif
 
 
+%if %{with pgsql}
 %package ido-pgsql
 Summary:        IDO PostgreSQL database backend for Icinga 2
 Group:          System/Monitoring
@@ -278,6 +278,7 @@ Requires:       %{name}-bin = %{version}-%{release}
 %description ido-pgsql
 Icinga 2 IDO PostgreSQL database backend. Compatible with Icinga 1.x
 IDOUtils schema >= 1.12
+%endif
 
 %if 0%{?use_selinux}
 %global selinux_variants mls targeted
@@ -373,25 +374,10 @@ CMAKE_OPTS="$CMAKE_OPTS -DINSTALL_SYSTEMD_SERVICE_AND_INITSCRIPT=ON"
 %else
 CMAKE_OPTS="$CMAKE_OPTS -DINSTALL_SYSTEMD_SERVICE_AND_INITSCRIPT=OFF"
 %endif
-%if %{with checker}
-CMAKE_OPTS="$CMAKE_OPTS -DICINGA2_WITH_CHECKER=ON"
-%else
-CMAKE_OPTS="$CMAKE_OPTS -DICINGA2_WITH_CHECKER=OFF"
-%endif
 %if %{with compat}
 CMAKE_OPTS="$CMAKE_OPTS -DICINGA2_WITH_COMPAT=ON"
 %else
 CMAKE_OPTS="$CMAKE_OPTS -DICINGA2_WITH_COMPAT=OFF"
-%endif
-%if %{with demo}
-CMAKE_OPTS="$CMAKE_OPTS -DICINGA2_WITH_DEMO=ON"
-%else
-CMAKE_OPTS="$CMAKE_OPTS -DICINGA2_WITH_DEMO=OFF"
-%endif
-%if %{with hello}
-CMAKE_OPTS="$CMAKE_OPTS -DICINGA2_WITH_HELLO=ON"
-%else
-CMAKE_OPTS="$CMAKE_OPTS -DICINGA2_WITH_HELLO=OFF"
 %endif
 %if %{with livestatus}
 CMAKE_OPTS="$CMAKE_OPTS -DICINGA2_WITH_LIVESTATUS=ON"
@@ -796,19 +782,23 @@ fi
 %{_datadir}/doc/%{name}
 %docdir %{_datadir}/doc/%{name}
 
+%if %{with mysql}
 %files ido-mysql
 %defattr(-,root,root,-)
 %doc COPYING README.md NEWS AUTHORS CHANGELOG.md
 %config(noreplace) %attr(0640,%{icinga_user},%{icinga_group}) %{_sysconfdir}/%{name}/features-available/ido-mysql.conf
 %{_libdir}/%{name}/libmysql_shim*
 %{_datadir}/icinga2-ido-mysql
+%endif
 
+%if %{with pgsql}
 %files ido-pgsql
 %defattr(-,root,root,-)
 %doc COPYING README.md NEWS AUTHORS CHANGELOG.md
 %config(noreplace) %attr(0640,%{icinga_user},%{icinga_group}) %{_sysconfdir}/%{name}/features-available/ido-pgsql.conf
 %{_libdir}/%{name}/libpgsql_shim*
 %{_datadir}/icinga2-ido-pgsql
+%endif
 
 %if 0%{?use_selinux}
 %files selinux
