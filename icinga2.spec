@@ -61,6 +61,26 @@
 %define icinga_group icinga
 %define icingacmd_group icingacmd
 
+# enable unity builds by default for all architectures except arm32
+%ifarch %{arm}
+%bcond_with unity_build
+%else
+%bcond_without unity_build
+%endif
+
+%bcond_without lto_build
+%bcond_with systemd_and_init
+%bcond_without checker
+%bcond_without compat
+%bcond_with demo
+%bcond_with hello
+%bcond_without livestatus
+%bcond_without notification
+%bcond_without perfdata
+%bcond_without tests
+%bcond_without mysql
+%bcond_without pgsql
+
 %define logmsg logger -t %{name}/rpm
 
 %define boost_min_version 1.66
@@ -326,7 +346,6 @@ CMAKE_OPTS="-DCMAKE_INSTALL_PREFIX=/usr \
          -DCMAKE_INSTALL_SYSCONFDIR=/etc \
          -DCMAKE_INSTALL_LOCALSTATEDIR=/var \
          -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-         -DICINGA2_LTO_BUILD=ON \
          -DCMAKE_VERBOSE_MAKEFILE=ON \
          -DBoost_NO_BOOST_CMAKE=ON \
          -DICINGA2_PLUGINDIR=%{plugindir} \
@@ -337,6 +356,72 @@ CMAKE_OPTS="-DCMAKE_INSTALL_PREFIX=/usr \
          -DICINGA2_COMMAND_GROUP=%{icingacmd_group}"
 %if 0%{?fedora}
 CMAKE_OPTS="$CMAKE_OPTS -DICINGA2_WITH_STUDIO=true"
+%endif
+
+%if %{with unity_build}
+CMAKE_OPTS="$CMAKE_OPTS -DICINGA2_UNITY_BUILD=ON"
+%else
+CMAKE_OPTS="$CMAKE_OPTS -DICINGA2_UNITY_BUILD=OFF"
+%endif
+%if %{with lto_build}
+CMAKE_OPTS="$CMAKE_OPTS -DICINGA2_LTO_BUILD=ON"
+%else
+CMAKE_OPTS="$CMAKE_OPTS -DICINGA2_LTO_BUILD=OFF"
+%endif
+%if %{with systemd_and_init}
+CMAKE_OPTS="$CMAKE_OPTS -DINSTALL_SYSTEMD_SERVICE_AND_INITSCRIPT=ON"
+%else
+CMAKE_OPTS="$CMAKE_OPTS -DINSTALL_SYSTEMD_SERVICE_AND_INITSCRIPT=OFF"
+%endif
+%if %{with checker}
+CMAKE_OPTS="$CMAKE_OPTS -DICINGA2_WITH_CHECKER=ON"
+%else
+CMAKE_OPTS="$CMAKE_OPTS -DICINGA2_WITH_CHECKER=OFF"
+%endif
+%if %{with compat}
+CMAKE_OPTS="$CMAKE_OPTS -DICINGA2_WITH_COMPAT=ON"
+%else
+CMAKE_OPTS="$CMAKE_OPTS -DICINGA2_WITH_COMPAT=OFF"
+%endif
+%if %{with demo}
+CMAKE_OPTS="$CMAKE_OPTS -DICINGA2_WITH_DEMO=ON"
+%else
+CMAKE_OPTS="$CMAKE_OPTS -DICINGA2_WITH_DEMO=OFF"
+%endif
+%if %{with hello}
+CMAKE_OPTS="$CMAKE_OPTS -DICINGA2_WITH_HELLO=ON"
+%else
+CMAKE_OPTS="$CMAKE_OPTS -DICINGA2_WITH_HELLO=OFF"
+%endif
+%if %{with livestatus}
+CMAKE_OPTS="$CMAKE_OPTS -DICINGA2_WITH_LIVESTATUS=ON"
+%else
+CMAKE_OPTS="$CMAKE_OPTS -DICINGA2_WITH_LIVESTATUS=OFF"
+%endif
+%if %{with notification}
+CMAKE_OPTS="$CMAKE_OPTS -DICINGA2_WITH_NOTIFICATION=ON"
+%else
+CMAKE_OPTS="$CMAKE_OPTS -DICINGA2_WITH_NOTIFICATION=OFF"
+%endif
+%if %{with perfdata}
+CMAKE_OPTS="$CMAKE_OPTS -DICINGA2_WITH_PERFDATA=ON"
+%else
+CMAKE_OPTS="$CMAKE_OPTS -DICINGA2_WITH_PERFDATA=OFF"
+%endif
+%if %{with tests}
+CMAKE_OPTS="$CMAKE_OPTS -DICINGA2_WITH_TESTS=ON"
+%else
+CMAKE_OPTS="$CMAKE_OPTS -DICINGA2_WITH_TESTS=OFF"
+%endif
+%if %{with mysql}
+CMAKE_OPTS="$CMAKE_OPTS -DICINGA2_WITH_MYSQL=ON"
+%else
+CMAKE_OPTS="$CMAKE_OPTS -DICINGA2_WITH_MYSQL=OFF"
+%endif
+%if %{with pgsql}
+CMAKE_OPTS="$CMAKE_OPTS -DICINGA2_WITH_PGSQL=ON"
+%else
+CMAKE_OPTS="$CMAKE_OPTS -DICINGA2_WITH_PGSQL=OFF"
 %endif
 
 %if (0%{?el6} || 0%{?rhel} == 6)
