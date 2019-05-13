@@ -68,7 +68,14 @@
 %bcond_without unity_build
 %endif
 
+# Disable lto_build for older SUSE versions
+# see https://github.com/Icinga/icinga2/issues/7149
+%if "%{_vendor}" == "suse" && 0%{?suse_version} <= 1315
+%bcond_with lto_build
+%else # suse_version 1315
 %bcond_without lto_build
+%endif # suse_version 1315
+
 %bcond_with systemd_and_init
 %bcond_without compat
 %bcond_without livestatus
