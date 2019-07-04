@@ -43,7 +43,8 @@ variables:
     - find build/
     - icinga-build-upload-aptly
   # TODO: enable when switching to GitLab CI
-  #only:
+  only:
+    - nonexisting_branch
   #  - tags
   #  - master
 
